@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 
-const FASTAPI_URL = 'http://localhost:8000/api/predict'; // adjust if different
+const FASTAPI_URL = `${process.env.NEXT_PUBLIC_FASTAPI_URL!}/api/predict`
 
 export default function UploadPage() {
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
