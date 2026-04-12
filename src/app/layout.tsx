@@ -4,8 +4,10 @@ import Providers from "./providers";
 import { jetbrainsMono, plusJakarta } from "@/fonts/google-fonts";
 import { Geist } from "next/font/google";
 import { cn } from "@/lib/utils";
+import { Toaster } from "@/components/ui/sonner";
+import { AgroToaster } from "@/components/global/AgroToaster";
 
-const geist = Geist({subsets:['latin'],variable:'--font-sans'});
+const geist = Geist({ subsets: ['latin'], variable: '--font-sans' });
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -26,6 +28,8 @@ export default function RootLayout({
         <Providers>
           {children}
         </Providers>
+        <AgroToaster />
+        <Toaster />
       </body>
     </html>
   );
