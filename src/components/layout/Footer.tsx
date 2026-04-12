@@ -1,15 +1,15 @@
 import Link from 'next/link';
 import { Mail, Heart, ExternalLink } from 'lucide-react';
-import { FaGithub, FaXTwitter, FaLinkedin } from 'react-icons/fa6';
+import { FaGithub, FaLinkedin, FaInstagram, FaFacebook } from 'react-icons/fa6';
 import AgroLeafLogo from '../global/AgroLeafLogo';
 import { SOCIAL_LINKS } from '@/const/social-links';
 
 const footerLinks = {
     product: [
         { name: 'Diagnose', href: '/diagnose' },
-        { name: 'How It Works', href: '/how-it-works' },
-        { name: 'Supported Crops', href: '/crops' },
-        { name: 'API Access', href: '/api' },
+        { name: 'How It Works', href: '/info/how-it-works' },
+        { name: 'Supported Crops', href: '/info/crops' },
+        { name: 'API Access', href: '/info/api-docs-client' },
     ],
     company: [
         { name: 'About Us', href: '/about' },
@@ -18,17 +18,18 @@ const footerLinks = {
         { name: 'Careers', href: '/careers' },
     ],
     support: [
-        { name: 'Help Center', href: '/help' },
-        { name: 'Contact', href: '/contact' },
-        { name: 'Privacy Policy', href: '/privacy' },
-        { name: 'Terms of Service', href: '/terms' },
+        { name: 'Help Center', href: '/info/help' },
+        { name: 'Contact', href: '/info/contact' },
+        { name: 'Privacy Policy', href: '/info/privacy-policy' },
+        { name: 'Terms of Service', href: '/info/terms' },
     ],
 };
 
 const socialLinks = [
     { href: SOCIAL_LINKS.GITHUB, icon: FaGithub, label: 'GitHub' },
-    { href: SOCIAL_LINKS.LINKEDIN, icon: FaXTwitter, label: 'Twitter / X' },
+    { href: SOCIAL_LINKS.FACEBOOK, icon: FaFacebook, label: 'Facebook' },   
     { href: SOCIAL_LINKS.LINKEDIN, icon: FaLinkedin, label: 'LinkedIn' },
+    { href: SOCIAL_LINKS.INSTAGRAM, icon: FaInstagram, label: 'Instagram' }, 
     { href: SOCIAL_LINKS.EMAIL, icon: Mail, label: 'Email' },
 ];
 

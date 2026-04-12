@@ -105,7 +105,7 @@ const CROPS_FRUITS = [
   { name: "Tomato", scientific: "Solanum lycopersicum", image: "/images/crop-fruits/tomato-1.jpeg", diseasesCount: 10, description: "Early blight, late blight, leaf mold, septoria, etc." },
   { name: "Grape", scientific: "Vitis vinifera", image: "/images/crop-fruits/grape-1.jpeg", diseasesCount: 4, description: "Black rot, leaf blight, powdery mildew, downy mildew" },
   { name: "Wheat", scientific: "Triticum aestivum", image: "/images/crop-fruits/wheat-1.jpeg", diseasesCount: 5, description: "Septoria, stripe rust, leaf rust, stem rust, powdery mildew" },
-  { name: "Corn (Maize)", scientific: "Zea mays", image: "/images/crop-fruits/cron-1.jpeg", diseasesCount: 4, description: "Cercospora, common rust, northern leaf blight, smut" },
+  { name: "Corn (Maize)", scientific: "Zea mays", image: "/images/crop-fruits/corn-1.jpeg", diseasesCount: 4, description: "Cercospora, common rust, northern leaf blight, smut" },
   { name: "Potato", scientific: "Solanum tuberosum", image: "/images/crop-fruits/potato-1.jpeg", diseasesCount: 3, description: "Early blight, late blight, healthy" },
 ];
 

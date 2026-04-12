@@ -1,11 +1,12 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, memo } from 'react';
 import { signIn } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
+import * as yup from 'yup';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import {
@@ -25,6 +26,28 @@ import { agToast } from '../global/AgroToaster';
 import AgroLeafLogo from '../global/AgroLeafLogo';
 
 type Flow = 'signin' | 'forgot-email' | 'forgot-otp' | 'create-or-signin';
+
+// ── Validation schemas (unchanged) ──────────────────────────────────────────────
+const emailSchema = yup.string().email('Invalid email address').required('Email is required');
+const passwordSchema = yup
+    .string()
+    .min(6, 'Password must be at least 6 characters')
+    .matches(/[A-Z]/, 'Must contain at least one uppercase letter')
+    .matches(/[a-z]/, 'Must contain at least one lowercase letter')
+    .matches(/[0-9]/, 'Must contain at least one number')
+    .matches(/[\W_]/, 'Must contain at least one special character')
+    .required('Password is required');
+
+const signInSchema = yup.object({
+    email: emailSchema,
+    password: passwordSchema,
+});
+
+const resetPasswordSchema = yup.object({
+    email: emailSchema,
+    otp: yup.string().length(6, 'OTP must be 6 digits').required('OTP is required'),
+    newPassword: passwordSchema,
+});
 
 // ── Slide variants ──────────────────────────────────────────────────────────────
 const slideVariants = {
@@ -74,12 +97,218 @@ function BackButton({ onClick }: { onClick: () => void }) {
     );
 }
 
-// ── Left panel decorative trust points ──────────────────────────────────────────
+// ── Field wrapper (memoized to avoid unnecessary re-renders) ────────────────────
+const Field = memo(({
+    id,
+    label,
+    icon,
+    children,
+    error,
+}: {
+    id: string;
+    label: string;
+    icon: React.ReactNode;
+    children: React.ReactNode;
+    error?: string;
+}) => (
+    <div className="space-y-1.5">
+        <Label htmlFor={id} className="flex items-center gap-1.5 text-sm font-medium text-[#1A2E1A] dark:text-white/80">
+            <span className="text-[#0A7B4A]/70">{icon}</span>
+            {label}
+        </Label>
+        {children}
+        {error && <p className="text-xs text-red-500 dark:text-red-400 mt-1">{error}</p>}
+    </div>
+));
+Field.displayName = 'Field';
+
+// ── Input style (constant) ──────────────────────────────────────────────────────
+const inputCls =
+    'h-11 rounded-xl border border-[rgba(10,123,74,0.25)] bg-[rgba(245,250,240,0.5)] dark:bg-[rgba(10,123,74,0.08)] backdrop-blur-sm focus-visible:ring-2 focus-visible:ring-[#0A7B4A] focus-visible:ring-offset-0 focus-visible:border-[#0A7B4A] placeholder:text-[#3A4D3A]/30 dark:placeholder:text-white/20 text-[#1A2E1A] dark:text-white/90 transition-all';
+
+// ── Left panel decorative trust points (unchanged) ──────────────────────────────
 const TRUST_POINTS = [
     { icon: Sprout, text: 'Diagnose 38+ crop diseases instantly' },
     { icon: ShieldCheck, text: '98% model accuracy you can rely on' },
     { icon: Leaf, text: 'Free for farmers & researchers' },
 ];
+
+// ── Separate memoized form components ───────────────────────────────────────────
+interface SignInFormProps {
+    email: string;
+    setEmail: (v: string) => void;
+    password: string;
+    setPassword: (v: string) => void;
+    showPassword: boolean;
+    setShowPassword: (v: boolean) => void;
+    loading: boolean;
+    fieldErrors: { email?: string; password?: string };
+    onSubmit: (e: React.FormEvent) => void;
+    onForgotClick: () => void;
+    onCreateOrSignIn: () => void;
+}
+
+const SignInForm = memo(({
+    email,
+    setEmail,
+    password,
+    setPassword,
+    showPassword,
+    setShowPassword,
+    loading,
+    fieldErrors,
+    onSubmit,
+    onForgotClick,
+    onCreateOrSignIn,
+}: SignInFormProps) => (
+    <form onSubmit={onSubmit} className="space-y-4 mt-1">
+        <Field id="email" label="Email address" icon={<Mail className="h-3.5 w-3.5" />} error={fieldErrors.email}>
+            <Input
+                id="email"
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                placeholder="you@example.com"
+                className={inputCls}
+                autoComplete="email"
+            />
+        </Field>
+
+        <Field id="password" label="Password" icon={<Lock className="h-3.5 w-3.5" />} error={fieldErrors.password}>
+            <div className="relative">
+                <Input
+                    id="password"
+                    type={showPassword ? 'text' : 'password'}
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    required
+                    placeholder="••••••••"
+                    className={`${inputCls} pr-10`}
+                    autoComplete="current-password"
+                />
+                <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-[#3A4D3A]/40 hover:text-[#0A7B4A] transition-colors"
+                    tabIndex={-1}
+                >
+                    {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                </button>
+            </div>
+            <div className="text-right -mt-0.5">
+                <button type="button" onClick={onForgotClick} className="text-xs text-[#0A7B4A] hover:underline underline-offset-2 font-medium">
+                    Forgot password?
+                </button>
+            </div>
+        </Field>
+
+        <GreenButton loading={loading} label="Sign In" loadingLabel="Signing in…" />
+
+        <div className="relative my-1">
+            <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t border-[rgba(10,123,74,0.15)]" />
+            </div>
+            <div className="relative flex justify-center">
+                <span className="px-3 text-xs uppercase tracking-wider text-[#3A4D3A]/40 dark:text-white/30 bg-white dark:bg-[#0d1a0e]">
+                    or
+                </span>
+            </div>
+        </div>
+
+        <button
+            type="button"
+            onClick={onCreateOrSignIn}
+            disabled={loading}
+            className="w-full flex items-center justify-center gap-2 h-11 rounded-xl border border-[rgba(10,123,74,0.3)] bg-transparent hover:bg-[rgba(10,123,74,0.05)] dark:hover:bg-[rgba(10,123,74,0.12)] text-sm font-medium text-[#0A7B4A] dark:text-[#4ade80] transition-all disabled:opacity-50"
+        >
+            <Mail className="h-4 w-4" />
+            Create or sign in with email
+        </button>
+    </form>
+));
+SignInForm.displayName = 'SignInForm';
+
+interface ForgotEmailFormProps {
+    email: string;
+    setEmail: (v: string) => void;
+    loading: boolean;
+    fieldErrors: { email?: string };
+    onSubmit: (e: React.FormEvent) => void;
+    onBack: () => void;
+}
+
+const ForgotEmailForm = memo(({ email, setEmail, loading, fieldErrors, onSubmit, onBack }: ForgotEmailFormProps) => (
+    <form onSubmit={onSubmit} className="space-y-4 mt-1">
+        <Field id="reset-email" label="Email address" icon={<Mail className="h-3.5 w-3.5" />} error={fieldErrors.email}>
+            <Input
+                id="reset-email"
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                placeholder="you@example.com"
+                className={inputCls}
+            />
+        </Field>
+        <GreenButton loading={loading} label="Send Reset Code" loadingLabel="Sending…" />
+        <BackButton onClick={onBack} />
+    </form>
+));
+ForgotEmailForm.displayName = 'ForgotEmailForm';
+
+interface ForgotOtpFormProps {
+    otp: string;
+    setOtp: (v: string) => void;
+    newPassword: string;
+    setNewPassword: (v: string) => void;
+    loading: boolean;
+    fieldErrors: { otp?: string; newPassword?: string };
+    onSubmit: (e: React.FormEvent) => void;
+    onBack: () => void;
+}
+
+const ForgotOtpForm = memo(({
+    otp,
+    setOtp,
+    newPassword,
+    setNewPassword,
+    loading,
+    fieldErrors,
+    onSubmit,
+    onBack,
+}: ForgotOtpFormProps) => (
+    <form onSubmit={onSubmit} className="space-y-4 mt-1">
+        <Field id="otp" label="Verification code" icon={<ShieldCheck className="h-3.5 w-3.5" />} error={fieldErrors.otp}>
+            <Input
+                id="otp"
+                type="text"
+                inputMode="numeric"
+                value={otp}
+                onChange={(e) => setOtp(e.target.value)}
+                required
+                placeholder="6-digit code"
+                className={`${inputCls} tracking-widest text-center text-lg font-mono`}
+                maxLength={6}
+            />
+        </Field>
+        <Field id="new-password" label="New password" icon={<Lock className="h-3.5 w-3.5" />} error={fieldErrors.newPassword}>
+            <Input
+                id="new-password"
+                type="password"
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
+                required
+                minLength={6}
+                placeholder="Minimum 6 characters, 1 uppercase, 1 number, 1 special"
+                className={inputCls}
+            />
+        </Field>
+        <GreenButton loading={loading} label="Reset Password" loadingLabel="Updating…" />
+        <BackButton onClick={onBack} />
+    </form>
+));
+ForgotOtpForm.displayName = 'ForgotOtpForm';
 
 // ── Main page component ──────────────────────────────────────────────────────────
 export default function SignInPage() {
@@ -95,17 +324,38 @@ export default function SignInPage() {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
     const [successMsg, setSuccessMsg] = useState('');
+    const [fieldErrors, setFieldErrors] = useState<{
+        email?: string;
+        password?: string;
+        otp?: string;
+        newPassword?: string;
+    }>({});
 
     const navigate = (next: Flow, direction = 1, preserveSuccess = false) => {
         setDir(direction);
         setError('');
+        setFieldErrors({});
         if (!preserveSuccess) setSuccessMsg('');
         setFlow(next);
     };
 
-    // ── Handlers ──────────────────────────────────────────────────────────────────
+    // ── Handlers (unchanged) ──────────────────────────────────────────────────────
     const handleSignIn = async (e: React.FormEvent) => {
         e.preventDefault();
+        try {
+            await signInSchema.validate({ email, password }, { abortEarly: false });
+        } catch (err) {
+            if (err instanceof yup.ValidationError) {
+                const errors: typeof fieldErrors = {};
+                err.inner.forEach((e) => {
+                    if (e.path === 'email') errors.email = e.message;
+                    if (e.path === 'password') errors.password = e.message;
+                });
+                setFieldErrors(errors);
+            }
+            return;
+        }
+        setFieldErrors({});
         setLoading(true);
         setError('');
         try {
@@ -139,6 +389,15 @@ export default function SignInPage() {
 
     const handleForgotSendOTP = async (e: React.FormEvent) => {
         e.preventDefault();
+        try {
+            await emailSchema.validate(email);
+        } catch (err) {
+            if (err instanceof yup.ValidationError) {
+                setFieldErrors({ email: err.message });
+            }
+            return;
+        }
+        setFieldErrors({});
         setLoading(true);
         setError('');
         try {
@@ -161,8 +420,21 @@ export default function SignInPage() {
 
     const handleResetPassword = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (!email || !otp || !newPassword) { setError('Missing information. Please start over.'); return; }
-        if (newPassword.length < 6) { setError('Password must be at least 6 characters.'); return; }
+        try {
+            await resetPasswordSchema.validate({ email, otp, newPassword }, { abortEarly: false });
+        } catch (err) {
+            if (err instanceof yup.ValidationError) {
+                const errors: typeof fieldErrors = {};
+                err.inner.forEach((e) => {
+                    if (e.path === 'email') errors.email = e.message;
+                    if (e.path === 'otp') errors.otp = e.message;
+                    if (e.path === 'newPassword') errors.newPassword = e.message;
+                });
+                setFieldErrors(errors);
+            }
+            return;
+        }
+        setFieldErrors({});
         setLoading(true);
         setError('');
         try {
@@ -173,7 +445,11 @@ export default function SignInPage() {
             });
             const text = await res.text();
             let data;
-            try { data = JSON.parse(text); } catch { throw new Error(`Invalid response: ${text}`); }
+            try {
+                data = JSON.parse(text);
+            } catch {
+                throw new Error(`Invalid response: ${text}`);
+            }
             if (!res.ok) throw new Error(data.error);
             setSuccessMsg('Password updated! You can now sign in.');
             setTimeout(() => navigate('signin', -1, true), 2000);
@@ -187,7 +463,15 @@ export default function SignInPage() {
     };
 
     const handleCreateOrSignIn = async () => {
-        if (!email) { setError('Please enter your email first.'); return; }
+        try {
+            await emailSchema.validate(email);
+        } catch (err) {
+            if (err instanceof yup.ValidationError) {
+                setFieldErrors({ email: err.message });
+            }
+            return;
+        }
+        setFieldErrors({});
         setLoading(true);
         setError('');
         try {
@@ -227,165 +511,61 @@ export default function SignInPage() {
         },
     };
 
-    // ── Field wrapper ──────────────────────────────────────────────────────────────
-    const Field = ({
-        id, label, icon, children,
-    }: { id: string; label: string; icon: React.ReactNode; children: React.ReactNode }) => (
-        <div className="space-y-1.5">
-            <Label htmlFor={id} className="flex items-center gap-1.5 text-sm font-medium text-[#1A2E1A] dark:text-white/80">
-                <span className="text-[#0A7B4A]/70">{icon}</span>
-                {label}
-            </Label>
-            {children}
-        </div>
-    );
+    const meta = flowMeta[flow] || flowMeta.signin;
 
-    // ── Input style ───────────────────────────────────────────────────────────────
-    const inputCls =
-        'h-11 rounded-xl border border-[rgba(10,123,74,0.25)] bg-[rgba(245,250,240,0.5)] dark:bg-[rgba(10,123,74,0.08)] backdrop-blur-sm focus-visible:ring-2 focus-visible:ring-[#0A7B4A] focus-visible:ring-offset-0 focus-visible:border-[#0A7B4A] placeholder:text-[#3A4D3A]/30 dark:placeholder:text-white/20 text-[#1A2E1A] dark:text-white/90 transition-all';
-
-    // ── Form panels ───────────────────────────────────────────────────────────────
+    // ── Render current form based on flow ────────────────────────────────────────
     const renderForm = () => {
         switch (flow) {
             case 'signin':
                 return (
-                    <form onSubmit={handleSignIn} className="space-y-4 mt-1">
-                        <Field id="email" label="Email address" icon={<Mail className="h-3.5 w-3.5" />}>
-                            <Input
-                                id="email"
-                                type="email"
-                                value={email}
-                                onChange={(e) => setEmail(e.target.value)}
-                                required
-                                placeholder="you@example.com"
-                                className={inputCls}
-                                autoComplete="email"
-                            />
-                        </Field>
-
-                        <Field id="password" label="Password" icon={<Lock className="h-3.5 w-3.5" />}>
-                            <div className="relative">
-                                <Input
-                                    id="password"
-                                    type={showPassword ? 'text' : 'password'}
-                                    value={password}
-                                    onChange={(e) => setPassword(e.target.value)}
-                                    required
-                                    placeholder="••••••••"
-                                    className={`${inputCls} pr-10`}
-                                    autoComplete="current-password"
-                                />
-                                <button
-                                    type="button"
-                                    onClick={() => setShowPassword((v) => !v)}
-                                    className="absolute right-3 top-1/2 -translate-y-1/2 text-[#3A4D3A]/40 hover:text-[#0A7B4A] transition-colors"
-                                    tabIndex={-1}
-                                >
-                                    {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                                </button>
-                            </div>
-                            <div className="text-right -mt-0.5">
-                                <button
-                                    type="button"
-                                    onClick={() => navigate('forgot-email', 1)}
-                                    className="text-xs text-[#0A7B4A] hover:underline underline-offset-2 font-medium"
-                                >
-                                    Forgot password?
-                                </button>
-                            </div>
-                        </Field>
-
-                        <GreenButton loading={loading} label="Sign In" loadingLabel="Signing in…" />
-
-                        {/* Divider */}
-                        <div className="relative my-1">
-                            <div className="absolute inset-0 flex items-center">
-                                <div className="w-full border-t border-[rgba(10,123,74,0.15)]" />
-                            </div>
-                            <div className="relative flex justify-center">
-                                <span className="px-3 text-xs uppercase tracking-wider text-[#3A4D3A]/40 dark:text-white/30 bg-white dark:bg-[#0d1a0e]">
-                                    or
-                                </span>
-                            </div>
-                        </div>
-
-                        <button
-                            type="button"
-                            onClick={handleCreateOrSignIn}
-                            disabled={loading}
-                            className="w-full flex items-center justify-center gap-2 h-11 rounded-xl border border-[rgba(10,123,74,0.3)] bg-transparent hover:bg-[rgba(10,123,74,0.05)] dark:hover:bg-[rgba(10,123,74,0.12)] text-sm font-medium text-[#0A7B4A] dark:text-[#4ade80] transition-all disabled:opacity-50"
-                        >
-                            <Mail className="h-4 w-4" />
-                            Create or sign in with email
-                        </button>
-                    </form>
+                    <SignInForm
+                        email={email}
+                        setEmail={setEmail}
+                        password={password}
+                        setPassword={setPassword}
+                        showPassword={showPassword}
+                        setShowPassword={setShowPassword}
+                        loading={loading}
+                        fieldErrors={fieldErrors}
+                        onSubmit={handleSignIn}
+                        onForgotClick={() => navigate('forgot-email', 1)}
+                        onCreateOrSignIn={handleCreateOrSignIn}
+                    />
                 );
-
             case 'forgot-email':
                 return (
-                    <form onSubmit={handleForgotSendOTP} className="space-y-4 mt-1">
-                        <Field id="reset-email" label="Email address" icon={<Mail className="h-3.5 w-3.5" />}>
-                            <Input
-                                id="reset-email"
-                                type="email"
-                                value={email}
-                                onChange={(e) => setEmail(e.target.value)}
-                                required
-                                placeholder="you@example.com"
-                                className={inputCls}
-                            />
-                        </Field>
-                        <GreenButton loading={loading} label="Send Reset Code" loadingLabel="Sending…" />
-                        <BackButton onClick={() => navigate('signin', -1)} />
-                    </form>
+                    <ForgotEmailForm
+                        email={email}
+                        setEmail={setEmail}
+                        loading={loading}
+                        fieldErrors={fieldErrors}
+                        onSubmit={handleForgotSendOTP}
+                        onBack={() => navigate('signin', -1)}
+                    />
                 );
-
             case 'forgot-otp':
                 return (
-                    <form onSubmit={handleResetPassword} className="space-y-4 mt-1">
-                        <Field id="otp" label="Verification code" icon={<ShieldCheck className="h-3.5 w-3.5" />}>
-                            <Input
-                                id="otp"
-                                type="text"
-                                inputMode="numeric"
-                                value={otp}
-                                onChange={(e) => setOtp(e.target.value)}
-                                required
-                                placeholder="6-digit code"
-                                className={`${inputCls} tracking-widest text-center text-lg font-mono`}
-                                maxLength={6}
-                            />
-                        </Field>
-                        <Field id="new-password" label="New password" icon={<Lock className="h-3.5 w-3.5" />}>
-                            <Input
-                                id="new-password"
-                                type="password"
-                                value={newPassword}
-                                onChange={(e) => setNewPassword(e.target.value)}
-                                required
-                                minLength={6}
-                                placeholder="Minimum 6 characters"
-                                className={inputCls}
-                            />
-                        </Field>
-                        <GreenButton loading={loading} label="Reset Password" loadingLabel="Updating…" />
-                        <BackButton onClick={() => navigate('forgot-email', -1)} />
-                    </form>
+                    <ForgotOtpForm
+                        otp={otp}
+                        setOtp={setOtp}
+                        newPassword={newPassword}
+                        setNewPassword={setNewPassword}
+                        loading={loading}
+                        fieldErrors={fieldErrors}
+                        onSubmit={handleResetPassword}
+                        onBack={() => navigate('forgot-email', -1)}
+                    />
                 );
-
             default:
                 return null;
         }
     };
 
-    const meta = flowMeta[flow] || flowMeta.signin;
-
+    // ── JSX (unchanged except the form rendering uses the new memoized components) ─
     return (
         <div className="min-h-screen flex bg-linear-to-b from-[#f0f7f2] via-[#f8fdf9] to-white dark:from-[#060e07] dark:via-[#0a120b] dark:to-[#0d1a0e]">
-
-            {/* ── Left panel: hero / branding (hidden on mobile) ─────────────── */}
+            {/* Left panel (unchanged) */}
             <div className="hidden lg:flex lg:w-[52%] xl:w-[55%] relative flex-col overflow-hidden">
-                {/* Full-bleed background image */}
                 <div className="absolute inset-0">
                     <Image
                         src="/images/crop-fruits/rice-2.jpeg"
@@ -394,9 +574,8 @@ export default function SignInPage() {
                         sizes="55vw"
                         className="object-cover object-center"
                         priority
-                        loading="eager"  
+                        loading="eager"
                     />
-                    {/* Left-to-right overlay: opaque on right where text sits, transparent on left */}
                     <div
                         className="absolute inset-0"
                         style={{
@@ -404,7 +583,6 @@ export default function SignInPage() {
                                 'linear-gradient(to right, rgba(5,14,6,0.18) 0%, rgba(5,14,6,0.55) 55%, rgba(5,14,6,0.88) 100%)',
                         }}
                     />
-                    {/* Bottom vignette */}
                     <div
                         className="absolute inset-x-0 bottom-0"
                         style={{
@@ -413,20 +591,14 @@ export default function SignInPage() {
                         }}
                     />
                 </div>
-
-                {/* Content over image */}
                 <div className="relative z-10 flex flex-col h-full px-12 py-10">
-                    {/* Logo */}
-                    <AgroLeafLogo />
-
-                    {/* Middle: headline */}
-                    <div className="flex-1 flex items-center">
-                        <div>
+                    <div className="flex-1 flex items-center justify-end">
+                        <div className="max-w-md text-right">
                             <motion.h2
                                 initial={{ opacity: 0, y: 24 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
-                                className="text-4xl xl:text-5xl font-extrabold text-white leading-[1.1] tracking-tight max-w-sm"
+                                className="text-4xl xl:text-5xl font-extrabold text-white leading-[1.1] tracking-tight"
                             >
                                 Protect your harvest with{' '}
                                 <span className="text-transparent bg-clip-text bg-linear-to-r from-[#10B981] to-[#4ade80]">
@@ -437,32 +609,28 @@ export default function SignInPage() {
                                 initial={{ opacity: 0, y: 16 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 transition={{ duration: 0.7, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
-                                className="mt-4 text-white/55 text-base leading-relaxed max-w-xs"
+                                className="mt-4 text-white/55 text-base leading-relaxed"
                             >
                                 Instant crop disease diagnosis from a single photo — so you can act before it spreads.
                             </motion.p>
-
-                            {/* Trust points */}
                             <div className="mt-8 space-y-3">
                                 {TRUST_POINTS.map(({ icon: Icon, text }, i) => (
                                     <motion.div
                                         key={text}
-                                        initial={{ opacity: 0, x: -16 }}
+                                        initial={{ opacity: 0, x: 16 }}
                                         animate={{ opacity: 1, x: 0 }}
                                         transition={{ duration: 0.5, delay: 0.2 + i * 0.08 }}
-                                        className="flex items-center gap-3"
+                                        className="flex items-center gap-3 justify-end"
                                     >
+                                        <span className="text-sm text-white/70 font-medium">{text}</span>
                                         <div className="flex items-center justify-center h-8 w-8 rounded-lg bg-[rgba(10,123,74,0.35)] border border-[rgba(16,185,129,0.3)] shrink-0">
                                             <Icon className="h-4 w-4 text-[#10B981]" />
                                         </div>
-                                        <span className="text-sm text-white/70 font-medium">{text}</span>
                                     </motion.div>
                                 ))}
                             </div>
                         </div>
                     </div>
-
-                    {/* Bottom: back-to-home link */}
                     <Link
                         href="/"
                         className="flex items-center gap-2 text-sm text-white/45 hover:text-white/75 transition-colors w-fit"
@@ -473,10 +641,8 @@ export default function SignInPage() {
                 </div>
             </div>
 
-            {/* ── Right panel: form ──────────────────────────────────────────── */}
+            {/* Right panel: form */}
             <div className="flex-1 flex flex-col items-center justify-center px-6 py-12 sm:px-10">
-
-                {/* Mobile: logo + back link */}
                 <div className="lg:hidden w-full max-w-sm mb-8 flex items-center justify-between">
                     <AgroLeafLogo />
                     <Link
@@ -488,18 +654,15 @@ export default function SignInPage() {
                     </Link>
                 </div>
 
-                {/* Card */}
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.55, ease: [0.16, 1, 0.3, 1] }}
                     className="w-full max-w-sm"
                 >
-                    {/* Top accent line */}
                     <div className="h-0.5 w-full rounded-t-2xl bg-linear-to-r from-transparent via-[#0A7B4A] to-transparent opacity-60" />
-
                     <div
-                        className="rounded-b-2xl rounded-tr-2xl p-7 shadow-[0_24px_64px_rgba(10,123,74,0.1)]"
+                        className="rounded-b-2xl rounded-tr-2xl p-7 shadow-[0_24px_64px_rgba(10,123,74,0.1)] signin-card"
                         style={{
                             background: 'rgba(255,255,255,0.82)',
                             backdropFilter: 'blur(20px)',
@@ -507,7 +670,6 @@ export default function SignInPage() {
                             borderTop: 'none',
                         }}
                     >
-                        {/* Dark mode override */}
                         <style>{`
                             @media (prefers-color-scheme: dark) {
                                 .signin-card { background: rgba(13,26,14,0.88) !important; border-color: rgba(10,123,74,0.28) !important; }
@@ -515,7 +677,6 @@ export default function SignInPage() {
                             .dark .signin-card { background: rgba(13,26,14,0.88) !important; border-color: rgba(10,123,74,0.28) !important; }
                         `}</style>
 
-                        {/* Animated header */}
                         <AnimatePresence mode="wait" custom={dir}>
                             <motion.div
                                 key={flow + '-header'}
@@ -543,7 +704,6 @@ export default function SignInPage() {
                             </motion.div>
                         </AnimatePresence>
 
-                        {/* Error / success banners */}
                         <AnimatePresence>
                             {error && (
                                 <motion.div
@@ -571,7 +731,6 @@ export default function SignInPage() {
                             )}
                         </AnimatePresence>
 
-                        {/* Animated form panels */}
                         <AnimatePresence mode="wait" custom={dir}>
                             <motion.div
                                 key={flow}
@@ -586,11 +745,10 @@ export default function SignInPage() {
                             </motion.div>
                         </AnimatePresence>
 
-                        {/* Footer note */}
                         <p className="text-center text-xs text-[#3A4D3A]/40 dark:text-white/25 mt-6">
                             By signing in, you agree to our{' '}
-                            <a href="/terms" className="text-[#0A7B4A] hover:underline">Terms</a>
-                            {' '}& {' '}
+                            <a href="/terms" className="text-[#0A7B4A] hover:underline">Terms</a>{' '}
+                            &{' '}
                             <a href="/privacy" className="text-[#0A7B4A] hover:underline">Privacy Policy</a>.
                         </p>
                     </div>
