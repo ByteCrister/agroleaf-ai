@@ -298,12 +298,12 @@ export function BannerCarousel() {
   const [direction, setDirection] = useState(1);
   const total = BANNER_SLIDES.length;
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
- 
+
   const goTo = (idx: number, dir = 1) => {
     setDirection(dir);
     setCurrent((idx + total) % total);
   };
- 
+
   const startAuto = () => {
     if (intervalRef.current) clearInterval(intervalRef.current);
     intervalRef.current = setInterval(() => {
@@ -311,33 +311,33 @@ export function BannerCarousel() {
       setCurrent((c) => (c + 1) % total);
     }, 5800);
   };
- 
+
   useEffect(() => {
     if (isPlaying) startAuto();
     else if (intervalRef.current) clearInterval(intervalRef.current);
     return () => { if (intervalRef.current) clearInterval(intervalRef.current); };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isPlaying]);
- 
+
   const slide = BANNER_SLIDES[current];
- 
+
   const imgVariants = {
     enter: (dir: number) => ({ opacity: 0, scale: 1.08, x: dir > 0 ? 60 : -60 }),
     center: { opacity: 1, scale: 1, x: 0 },
     exit: (dir: number) => ({ opacity: 0, scale: 0.95, x: dir > 0 ? -40 : 40 }),
   };
- 
+
   const textVariants = {
     enter: { opacity: 0, y: 36 },
     center: { opacity: 1, y: 0 },
     exit: { opacity: 0, y: -20 },
   };
- 
+
   return (
     <section className="relative w-full overflow-hidden">
       {/* ── MAIN SLIDE AREA ── */}
-      <div className="relative h-[90vh] min-h-[600px] max-h-[900px] flex flex-col">
- 
+      <div className="relative h-[90vh] min-h-150 max-h-225 flex flex-col">
+
         {/* ── LAYER 0: Full-bleed crop image ── */}
         <div className="absolute inset-0 z-0 overflow-hidden">
           <AnimatePresence custom={direction} mode="sync">
@@ -362,7 +362,7 @@ export function BannerCarousel() {
             </motion.div>
           </AnimatePresence>
         </div>
- 
+
         {/* ── LAYER 1: Left-to-right gradient overlay ──
             Strong dark on the left where text lives → fully transparent on the right
             so the crop image is fully visible on the right side.
@@ -374,7 +374,7 @@ export function BannerCarousel() {
               "linear-gradient(to right, rgba(5,14,6,0.82) 0%, rgba(5,14,6,0.68) 30%, rgba(5,14,6,0.35) 55%, rgba(5,14,6,0.08) 75%, transparent 100%)",
           }}
         />
- 
+
         {/* ── LAYER 2: Subtle bottom vignette — keeps nav bar readable ── */}
         <div
           className="absolute inset-x-0 bottom-0 z-10 pointer-events-none"
@@ -384,7 +384,7 @@ export function BannerCarousel() {
               "linear-gradient(to top, rgba(5,14,6,0.65) 0%, rgba(5,14,6,0.3) 50%, transparent 100%)",
           }}
         />
- 
+
         {/* ── LAYER 3: Noise / grain texture ── */}
         <div
           className="absolute inset-0 z-10 opacity-[0.025] pointer-events-none"
@@ -393,7 +393,7 @@ export function BannerCarousel() {
             backgroundSize: "200px 200px",
           }}
         />
- 
+
         {/* ── LAYER 4: Dot-grid accent (very subtle, only on the left text area) ── */}
         <div
           className="absolute inset-y-0 left-0 z-10 opacity-[0.035] pointer-events-none"
@@ -403,20 +403,20 @@ export function BannerCarousel() {
             backgroundSize: "40px 40px",
           }}
         />
- 
+
         {/* ── LAYER 5: Top progress bar ── */}
-        <div className="absolute top-0 left-0 right-0 h-[3px] bg-white/10 z-30">
+        <div className="absolute top-0 left-0 right-0 h-0.75 bg-white/10 z-30">
           {isPlaying && (
             <motion.div
               key={`bar-${current}`}
               initial={{ width: "0%" }}
               animate={{ width: "100%" }}
               transition={{ duration: 5.8, ease: "linear" }}
-              className="h-full bg-gradient-to-r from-[#10B981] via-[#4ade80] to-[#86efac]"
+              className="h-full bg-linear-to-r from-[#10B981] via-[#4ade80] to-[#86efac]"
             />
           )}
         </div>
- 
+
         {/* ── LAYER 6: Slide index strip — left vertical ── */}
         <div className="absolute left-5 md:left-8 top-1/2 -translate-y-1/2 z-20 hidden md:flex flex-col items-center gap-3">
           {BANNER_SLIDES.map((_, i) => (
@@ -424,18 +424,17 @@ export function BannerCarousel() {
               key={i}
               onClick={() => { goTo(i, i > current ? 1 : -1); setIsPlaying(false); }}
               aria-label={`Slide ${i + 1}`}
-              className={`transition-all duration-500 rounded-full ${
-                i === current
-                  ? "h-10 w-[3px] bg-[#10B981]"
-                  : "h-4 w-[3px] bg-white/30 hover:bg-white/55"
-              }`}
+              className={`transition-all duration-500 rounded-full ${i === current
+                  ? "h-10 w-0.75 bg-[#10B981]"
+                  : "h-4 w-0.75 bg-white/30 hover:bg-white/55"
+                }`}
             />
           ))}
         </div>
- 
+
         {/* ── LAYER 7: MAIN TEXT CONTENT ── */}
         <div className="relative z-20 flex flex-col justify-end h-full pb-24 md:pb-20 px-6 md:px-14 lg:px-20 max-w-7xl mx-auto w-full">
- 
+
           {/* Slide number watermark — top right */}
           <div
             className={`${jetbrainsMono.className} absolute top-7 right-7 text-[11px] font-bold text-white/30 tracking-[0.2em] hidden md:block`}
@@ -443,7 +442,7 @@ export function BannerCarousel() {
             {String(current + 1).padStart(2, "0")}{" "}
             <span className="text-white/15">/ {String(total).padStart(2, "0")}</span>
           </div>
- 
+
           {/* Tag pill */}
           <AnimatePresence mode="wait">
             <motion.div
@@ -466,7 +465,7 @@ export function BannerCarousel() {
               </span>
             </motion.div>
           </AnimatePresence>
- 
+
           {/* Headline */}
           <AnimatePresence mode="wait">
             <motion.div
@@ -480,13 +479,13 @@ export function BannerCarousel() {
               <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-extrabold tracking-tight leading-[1.02] text-white max-w-3xl drop-shadow-[0_2px_12px_rgba(0,0,0,0.4)]">
                 {slide.headline}
                 <br />
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#10B981] via-[#4ade80] to-[#86efac]">
+                <span className="text-transparent bg-clip-text bg-linear-to-r from-[#10B981] via-[#4ade80] to-[#86efac]">
                   {slide.headlineAccent}
                 </span>
               </h1>
             </motion.div>
           </AnimatePresence>
- 
+
           {/* Divider line */}
           <AnimatePresence mode="wait">
             <motion.div
@@ -495,10 +494,10 @@ export function BannerCarousel() {
               animate={{ scaleX: 1, opacity: 1 }}
               exit={{ scaleX: 0, opacity: 0 }}
               transition={{ duration: 0.5, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
-              className="origin-left mt-6 mb-5 w-24 h-[2px] bg-gradient-to-r from-[#10B981] to-transparent"
+              className="origin-left mt-6 mb-5 w-24 h-0.5 bg-linear-to-r from-[#10B981] to-transparent"
             />
           </AnimatePresence>
- 
+
           {/* Sub + CTAs row */}
           <div className="flex flex-col md:flex-row md:items-end gap-8">
             {/* Sub */}
@@ -515,7 +514,7 @@ export function BannerCarousel() {
                 {slide.sub}
               </motion.p>
             </AnimatePresence>
- 
+
             {/* CTAs */}
             <AnimatePresence mode="wait">
               <motion.div
@@ -552,35 +551,33 @@ export function BannerCarousel() {
             </AnimatePresence>
           </div>
         </div>
- 
+
         {/* ── LAYER 8: Bottom nav controls bar ── */}
         <div className="absolute bottom-0 left-0 right-0 z-20 border-t border-white/10 backdrop-blur-md bg-black/25">
           <div className="max-w-7xl mx-auto px-6 md:px-14 lg:px-20 py-4 flex items-center justify-between gap-4">
- 
+
             {/* Mobile dots */}
             <div className="flex items-center gap-2 md:hidden">
               {BANNER_SLIDES.map((_, i) => (
                 <button
                   key={i}
                   onClick={() => { goTo(i, i > current ? 1 : -1); setIsPlaying(false); }}
-                  className={`rounded-full transition-all duration-300 ${
-                    i === current ? "w-6 h-2 bg-[#10B981]" : "w-2 h-2 bg-white/30"
-                  }`}
+                  className={`rounded-full transition-all duration-300 ${i === current ? "w-6 h-2 bg-[#10B981]" : "w-2 h-2 bg-white/30"
+                    }`}
                 />
               ))}
             </div>
- 
+
             {/* Slide thumbnails — desktop */}
             <div className="hidden md:flex items-center gap-3">
               {BANNER_SLIDES.map((s, i) => (
                 <button
                   key={i}
                   onClick={() => { goTo(i, i > current ? 1 : -1); setIsPlaying(false); }}
-                  className={`relative overflow-hidden rounded-xl transition-all duration-400 ${
-                    i === current
+                  className={`relative overflow-hidden rounded-xl transition-all duration-400 ${i === current
                       ? "ring-2 ring-[#10B981] ring-offset-1 ring-offset-transparent scale-105"
                       : "opacity-50 hover:opacity-75 scale-100"
-                  }`}
+                    }`}
                   style={{ width: 64, height: 40 }}
                   aria-label={`Slide ${i + 1}: ${s.headlineAccent}`}
                 >
@@ -597,7 +594,7 @@ export function BannerCarousel() {
                 </button>
               ))}
             </div>
- 
+
             {/* Right controls */}
             <div className="flex items-center gap-2 ml-auto">
               <button
@@ -628,7 +625,7 @@ export function BannerCarousel() {
           </div>
         </div>
       </div>
- 
+
       {/* ── Trust bar ── */}
       <div className="bg-[rgba(10,123,74,0.06)] dark:bg-[rgba(10,123,74,0.1)] border-b border-[rgba(10,123,74,0.12)] py-4">
         <div className="container mx-auto max-w-5xl px-6">
@@ -672,7 +669,7 @@ export default function HomePage() {
 
   return (
     <main
-      className={`${plusJakarta.className} min-h-screen overflow-x-hidden bg-gradient-to-b from-[#f0f7f2] via-[#f8fdf9] to-white dark:from-[#060e07] dark:via-[#0a120b] dark:to-[#0d1a0e]`}
+      className={`${plusJakarta.className} min-h-screen overflow-x-hidden bg-linear-to-b from-[#f0f7f2] via-[#f8fdf9] to-white dark:from-[#060e07] dark:via-[#0a120b] dark:to-[#0d1a0e]`}
     >
       {/* Global glass card styles — only what Tailwind can't express */}
       <style>{`
@@ -732,7 +729,7 @@ export default function HomePage() {
           {HOW_IT_WORKS.map(({ step, icon: Icon, title, desc }, i) => (
             <motion.div key={step} {...fadeUp(i * 0.1)} className="relative group">
               {i < HOW_IT_WORKS.length - 1 && (
-                <div className="hidden md:block absolute top-9 left-[calc(50%+28px)] -right-7 h-px bg-gradient-to-r from-[rgba(10,123,74,0.3)] to-transparent z-0" />
+                <div className="hidden md:block absolute top-9 left-[calc(50%+28px)] -right-7 h-px bg-linear-to-r from-[rgba(10,123,74,0.3)] to-transparent z-0" />
               )}
               <div className="glass-card crop-card relative rounded-2xl p-5 text-center transition-all duration-300 z-10">
                 <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-[rgba(10,123,74,0.1)] dark:bg-[rgba(10,123,74,0.2)] group-hover:bg-[#0A7B4A] transition-colors duration-300">
@@ -784,7 +781,7 @@ export default function HomePage() {
                         sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
                         className="object-cover transition-transform duration-500 group-hover:scale-105"
                       />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
+                      <div className="absolute inset-0 bg-linear-to-t from-black/40 to-transparent" />
                       <span className="absolute top-3 right-3 text-xs font-semibold px-2.5 py-1 rounded-full bg-[#0A7B4A]/90 text-white backdrop-blur-sm">
                         {item.diseasesCount} diseases
                       </span>
@@ -842,7 +839,7 @@ export default function HomePage() {
               transition={{ type: "spring", stiffness: 280, damping: 22 }}
             >
               <div className="glass-card crop-card rounded-2xl overflow-hidden h-full transition-all duration-300">
-                <div className={`h-1.5 bg-gradient-to-r ${category.accentDark}`} />
+                <div className={`h-1.5 bg-linear-to-r ${category.accentDark}`} />
                 <div className="px-6 pt-5 pb-3 flex items-center gap-3">
                   <div className="flex items-center justify-center h-10 w-10 rounded-xl bg-[rgba(10,123,74,0.1)] dark:bg-[rgba(10,123,74,0.18)] shrink-0">
                     <category.icon className="h-5 w-5 text-[#0A7B4A] dark:text-[#4ade80]" />
@@ -862,7 +859,7 @@ export default function HomePage() {
                     <Accordion key={disease.name} type="single" collapsible className="w-full">
                       <AccordionItem
                         value={disease.name}
-                        className="border-0 rounded-xl overflow-hidden bg-[rgba(245,250,240,0.5)] border border-[rgba(10,123,74,0.12)]"
+                        className="rounded-xl overflow-hidden bg-[rgba(245,250,240,0.5)] border border-[rgba(10,123,74,0.12)]"
                       >
                         <div className="px-3.5 pt-3 pb-1">
                           <div className="flex items-start justify-between gap-3">
@@ -931,8 +928,21 @@ export default function HomePage() {
             whileInView={{ opacity: 1, scale: 1 }}
             viewport={{ once: true }}
             transition={{ duration: 0.65, ease: [0.16, 1, 0.3, 1] }}
-            className="relative overflow-hidden rounded-3xl p-10 md:p-14 text-center bg-gradient-to-br from-[#0A7B4A] via-[#2C5F2D] to-[#1a4d1b] shadow-[0_24px_80px_rgba(10,123,74,0.35)]"
+            className="relative overflow-hidden rounded-3xl p-10 md:p-14 text-center shadow-[0_24px_80px_rgba(10,123,74,0.35)]"
           >
+            {/* ── Background image ── */}
+            <Image
+              src="/images/crop-fruits/rice-1.jpeg"
+              alt=""
+              fill
+              className="object-cover object-center"
+              priority
+            />
+
+            {/* ── Dark gradient overlay ── */}
+            <div className="absolute inset-0 bg-linear-to-br from-black/70 via-[#0A7B4A]/60 to-black/75" />
+
+            {/* ── Original decorative layers (kept on top of overlay) ── */}
             <div
               className="absolute inset-0 opacity-[0.06]"
               style={{
@@ -943,6 +953,7 @@ export default function HomePage() {
             <div className="absolute top-0 left-1/4 w-64 h-64 rounded-full bg-white/5 blur-3xl pointer-events-none" />
             <div className="absolute bottom-0 right-1/4 w-48 h-48 rounded-full bg-[#10B981]/10 blur-3xl pointer-events-none" />
 
+            {/* ── Content ── */}
             <div className="relative z-10">
               <motion.div
                 initial={{ opacity: 0, y: 10 }}
