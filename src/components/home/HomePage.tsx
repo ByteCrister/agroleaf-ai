@@ -587,6 +587,7 @@ export function BannerCarousel() {
                     fill
                     sizes="64px"
                     className="object-cover"
+                    loading="eager"
                   />
                   {i === current && (
                     <div className="absolute inset-0 bg-[#10B981]/20" />
@@ -937,6 +938,7 @@ export default function HomePage() {
               fill
               className="object-cover object-center"
               priority
+              loading="eager"
             />
 
             {/* ── Dark gradient overlay ── */}

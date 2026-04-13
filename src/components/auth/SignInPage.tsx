@@ -463,6 +463,7 @@ export default function SignInPage() {
     };
 
     const handleCreateOrSignIn = async () => {
+        // Validate the email before redirecting (optional but nice)
         try {
             await emailSchema.validate(email);
         } catch (err) {
@@ -472,19 +473,8 @@ export default function SignInPage() {
             return;
         }
         setFieldErrors({});
-        setLoading(true);
-        setError('');
-        try {
-            const result = await signIn('email-signin', { email, redirect: false });
-            if (result?.error) throw new Error(result.error);
-            router.push('/');
-        } catch (err: unknown) {
-            let message = 'Something went wrong';
-            if (err instanceof Error) message = err.message;
-            agToast.error('Failed to send link', message);
-        } finally {
-            setLoading(false);
-        }
+        // Redirect to Google OAuth flow
+        signIn('google', { callbackUrl: '/', login_hint: email });
     };
 
     // ── Flow metadata ─────────────────────────────────────────────────────────────
