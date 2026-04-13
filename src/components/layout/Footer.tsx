@@ -7,9 +7,9 @@ import { SOCIAL_LINKS } from '@/const/social-links';
 const footerLinks = {
     product: [
         { name: 'Diagnose', href: '/diagnose' },
-        { name: 'How It Works', href: '/info/how-it-works' },
-        { name: 'Supported Crops', href: '/info/crops' },
-        { name: 'API Access', href: '/info/api-docs-client' },
+        { name: 'How It Works', href: '/how-it-works' },
+        { name: 'Supported Crops', href: '/crops' },
+        { name: 'API Access', href: '/api-docs-client' },
     ],
     company: [
         { name: 'About Us', href: '/about' },
@@ -18,10 +18,10 @@ const footerLinks = {
         { name: 'Careers', href: '/careers' },
     ],
     support: [
-        { name: 'Help Center', href: '/info/help' },
-        { name: 'Contact', href: '/info/contact' },
-        { name: 'Privacy Policy', href: '/info/privacy-policy' },
-        { name: 'Terms of Service', href: '/info/terms' },
+        { name: 'Help Center', href: '/help' },
+        { name: 'Contact', href: '/contact' },
+        { name: 'Privacy Policy', href: '/privacy-policy' },
+        { name: 'Terms of Service', href: '/terms' },
     ],
 };
 

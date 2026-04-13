@@ -2,8 +2,8 @@
 
 import { cropsData } from "@/data/dataset-data";
 import { SOCIAL_LINKS } from "@/const/social-links";
-import { DatasetTree } from "@/components/about/DatasetTree";
-import { DatasetBusNetwork } from "@/components/about/DatasetBusNetwork";
+import { DatasetTree } from "@/components/info/about/DatasetTree";
+import { DatasetBusNetwork } from "@/components/info/about/DatasetBusNetwork";
 import { Button } from "@/components/ui/button";
 import { Mail, Layers, Brain, Database } from "lucide-react";
 import {

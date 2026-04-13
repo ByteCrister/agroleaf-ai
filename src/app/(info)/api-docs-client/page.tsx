@@ -9,7 +9,7 @@ export const metadata: Metadata = {
     title: "AgroLeaf AI API Docs – Diagnose Crop Diseases Programmatically",
     description:
       "REST API for crop disease detection. Supports 30 crops, 134 disease classes. Returns confidence scores and AI-generated agronomic feedback.",
-    url: "https://agroleaf-ai.vercel.app/info/api-docs-client",
+    url: "https://agroleaf-ai.vercel.app/api-docs-client",
     type: "website",
     images: [
       {
@@ -34,7 +34,7 @@ export const metadata: Metadata = {
     "Gemini agronomic advice",
   ],
   alternates: {
-    canonical: "https://agroleaf-ai.vercel.app/info/api-docs-client",
+    canonical: "https://agroleaf-ai.vercel.app/api-docs-client",
   },
 };
 

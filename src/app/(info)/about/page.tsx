@@ -1,5 +1,5 @@
 import { Metadata } from "next";
-import AboutPage from "@/components/about/AboutPage";
+import AboutPage from "@/components/info/about/AboutPage";
 
 export const metadata: Metadata = {
   title: "About – AgroLeaf AI Project & Dataset",

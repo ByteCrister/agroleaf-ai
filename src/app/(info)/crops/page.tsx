@@ -9,7 +9,7 @@ export const metadata: Metadata = {
     title: "Crop Disease Encyclopedia – AgroLeaf AI",
     description:
       "Browse all crops and diseases supported by our CNN model. Includes apple, tomato, rice, maize, and many more.",
-    url: "https://agroleaf-ai.vercel.app/info/crops",
+    url: "https://agroleaf-ai.vercel.app/crops",
     siteName: "AgroLeaf AI",
     images: [
       {
@@ -28,7 +28,7 @@ export const metadata: Metadata = {
     images: ["/og-crop.png"],
   },
   alternates: {
-    canonical: "https://agroleaf-ai.vercel.app/info/crops",
+    canonical: "https://agroleaf-ai.vercel.app/crops",
   },
 };
 

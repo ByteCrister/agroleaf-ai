@@ -1,8 +1,9 @@
 'use client';
 
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { Button } from '@/components/ui/button';
-import { Menu, X, LogOut, User, Settings, ChevronDown, Sprout, BookOpen, Leaf } from 'lucide-react';
+import { Menu, X, LogOut, User, Settings, ChevronDown, Sprout, BookOpen, Leaf, Code } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
@@ -27,6 +28,18 @@ const navLinks = [
     icon: Sprout,
   },
   {
+    name: 'Crops',
+    href: '/crops',
+    description: 'Manage and explore crops',
+    icon: Leaf,
+  },
+  {
+    name: 'API Docs',
+    href: '/api-docs-client',
+    description: 'Developer documentation',
+    icon: Code,
+  },
+  {
     name: 'About',
     href: '/about',
     description: 'Our mission & research',
@@ -38,6 +51,7 @@ export function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const { user, isAuthenticated } = useUserStore();
+  const pathname = usePathname();
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 12);
@@ -80,20 +94,48 @@ export function Header() {
             <nav className="hidden md:flex items-center gap-1">
               {navLinks.map((link) => {
                 const Icon = link.icon;
+                const isActive = pathname === link.href;
+
+                if (link.href === '/diagnose') {
+                  return (
+                    <Link
+                      key={link.name}
+                      href={link.href}
+                      className={cn(
+                        'group relative flex items-center gap-2 px-4 py-2 mr-1 rounded-full text-sm font-semibold transition-all duration-300',
+                        'text-[#0A7B4A] dark:text-[#22c55e]',
+                        isActive
+                          ? 'bg-[rgba(10,123,74,0.16)] dark:bg-[rgba(10,123,74,0.25)] border border-[#0A7B4A]/50 dark:border-[#22c55e]/50 ring-2 ring-[#0A7B4A]/30'
+                          : 'bg-[rgba(10,123,74,0.08)] dark:bg-[rgba(10,123,74,0.15)] border border-[#0A7B4A]/30 dark:border-[#22c55e]/30 hover:bg-[rgba(10,123,74,0.12)] dark:hover:bg-[rgba(10,123,74,0.25)] hover:border-[#0A7B4A]/50 dark:hover:border-[#22c55e]/50 ring-1 ring-[#0A7B4A]/20 hover:ring-[#0A7B4A]/40',
+                        'shadow-[0_0_12px_rgba(10,123,74,0.15)] hover:shadow-[0_0_20px_rgba(10,123,74,0.25)] outline-none focus-visible:ring-2 focus-visible:ring-[#0A7B4A] focus-visible:ring-offset-2'
+                      )}
+                    >
+                      <Icon className="h-4 w-4" />
+                      {link.name}
+                      <span className={cn(
+                        "absolute bottom-1 left-4 right-4 h-px bg-[#0A7B4A] transition-transform duration-300 origin-left rounded-full",
+                        isActive ? "scale-x-100" : "scale-x-0 group-hover:scale-x-100"
+                      )} />
+                    </Link>
+                  );
+                }
                 return (
                   <Link
                     key={link.name}
                     href={link.href}
                     className={cn(
-                      'group relative flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-medium transition-all duration-200',
-                      'text-[#1A2E1A]/70 dark:text-white/60',
-                      'hover:text-[#0A7B4A] dark:hover:text-[#22c55e]',
-                      'hover:bg-[rgba(10,123,74,0.06)] dark:hover:bg-[rgba(10,123,74,0.15)]',
+                      'group relative flex items-center gap-1.5 px-3 py-2 rounded-full text-sm font-medium transition-all duration-200',
+                      isActive
+                        ? 'text-[#0A7B4A] dark:text-[#22c55e] bg-[rgba(10,123,74,0.06)] dark:bg-[rgba(10,123,74,0.15)]'
+                        : 'text-[#1A2E1A]/70 dark:text-white/60 hover:text-[#0A7B4A] dark:hover:text-[#22c55e] hover:bg-[rgba(10,123,74,0.06)] dark:hover:bg-[rgba(10,123,74,0.15)]'
                     )}
                   >
-                    <Icon className="h-3.5 w-3.5 opacity-70 group-hover:opacity-100 transition-opacity" />
+                    <Icon className={cn("h-3.5 w-3.5 transition-opacity", isActive ? "opacity-100" : "opacity-70 group-hover:opacity-100")} />
                     {link.name}
-                    <span className="absolute bottom-1 left-4 right-4 h-px bg-[#0A7B4A] scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left rounded-full" />
+                    <span className={cn(
+                      "absolute bottom-1 left-4 right-4 h-px bg-[#0A7B4A] transition-transform duration-300 origin-left rounded-full",
+                      isActive ? "scale-x-100" : "scale-x-0 group-hover:scale-x-100"
+                    )} />
                   </Link>
                 );
               })}
@@ -210,6 +252,7 @@ export function Header() {
               <div className="container mx-auto px-4 py-4 flex flex-col gap-2">
                 {navLinks.map((link, i) => {
                   const Icon = link.icon;
+                  const isActive = pathname === link.href;
                   return (
                     <motion.div
                       key={link.name}
@@ -220,14 +263,35 @@ export function Header() {
                       <Link
                         href={link.href}
                         onClick={() => setMobileMenuOpen(false)}
-                        className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-[rgba(10,123,74,0.06)] dark:hover:bg-[rgba(10,123,74,0.15)] transition-colors group"
+                        className={cn(
+                          "flex items-center gap-3 px-4 py-3 rounded-xl transition-colors group relative",
+                          link.href === '/diagnose' 
+                            ? isActive 
+                              ? "bg-[rgba(10,123,74,0.16)] dark:bg-[rgba(10,123,74,0.25)] border border-[#0A7B4A]/50 dark:border-[#22c55e]/50 shadow-[0_0_12px_rgba(10,123,74,0.15)] ring-2 ring-[#0A7B4A]/30"
+                              : "bg-[rgba(10,123,74,0.08)] dark:bg-[rgba(10,123,74,0.15)] border border-[#0A7B4A]/30 dark:border-[#22c55e]/30 shadow-[0_0_12px_rgba(10,123,74,0.1)] ring-1 ring-[#0A7B4A]/20 hover:bg-[rgba(10,123,74,0.12)]"
+                            : isActive ? "bg-[rgba(10,123,74,0.08)] dark:bg-[rgba(10,123,74,0.15)]" : "hover:bg-[rgba(10,123,74,0.06)] dark:hover:bg-[rgba(10,123,74,0.15)]"
+                        )}
                       >
-                        <div className="flex items-center justify-center h-9 w-9 rounded-lg bg-[rgba(10,123,74,0.08)] dark:bg-[rgba(10,123,74,0.2)] group-hover:bg-[rgba(10,123,74,0.14)] transition-colors">
-                          <Icon className="h-4 w-4 text-[#0A7B4A]" />
+                        <div className={cn(
+                          "flex items-center justify-center h-9 w-9 rounded-lg transition-colors",
+                          link.href === '/diagnose'
+                            ? "bg-[rgba(10,123,74,0.15)] dark:bg-[rgba(10,123,74,0.25)]"
+                            : isActive ? "bg-[rgba(10,123,74,0.15)] dark:bg-[rgba(10,123,74,0.25)] text-[#0A7B4A]" : "bg-[rgba(10,123,74,0.08)] dark:bg-[rgba(10,123,74,0.2)] group-hover:bg-[rgba(10,123,74,0.14)]"
+                        )}>
+                          <Icon className={cn(
+                            "h-4 w-4",
+                            link.href === '/diagnose' || isActive ? "text-[#0A7B4A] dark:text-[#22c55e]" : "text-[#0A7B4A]"
+                          )} />
                         </div>
                         <div>
-                          <p className="text-sm font-semibold text-[#1A2E1A] dark:text-white">{link.name}</p>
-                          <p className="text-xs text-[#3A4D3A]/60 dark:text-white/40">{link.description}</p>
+                          <p className={cn(
+                            "text-sm font-semibold",
+                            link.href === '/diagnose' || isActive ? "text-[#0A7B4A] dark:text-[#22c55e]" : "text-[#1A2E1A] dark:text-white"
+                          )}>{link.name}</p>
+                          <p className={cn(
+                            "text-xs",
+                            link.href === '/diagnose' || isActive ? "text-[#0A7B4A]/80 dark:text-[#22c55e]/80" : "text-[#3A4D3A]/60 dark:text-white/40"
+                          )}>{link.description}</p>
                         </div>
                       </Link>
                     </motion.div>

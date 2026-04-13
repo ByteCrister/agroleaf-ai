@@ -112,7 +112,7 @@ const Field = memo(({
     error?: string;
 }) => (
     <div className="space-y-1.5">
-        <Label htmlFor={id} className="flex items-center gap-1.5 text-sm font-medium text-[#1A2E1A] dark:text-white/80">
+        <Label htmlFor={id} className="flex items-center gap-1.5 text-sm font-medium text-[#1A2E1A] dark:text-white/90">
             <span className="text-[#0A7B4A]/70">{icon}</span>
             {label}
         </Label>
@@ -124,7 +124,7 @@ Field.displayName = 'Field';
 
 // ── Input style (constant) ──────────────────────────────────────────────────────
 const inputCls =
-    'h-11 rounded-xl border border-[rgba(10,123,74,0.25)] bg-[rgba(245,250,240,0.5)] dark:bg-[rgba(10,123,74,0.08)] backdrop-blur-sm focus-visible:ring-2 focus-visible:ring-[#0A7B4A] focus-visible:ring-offset-0 focus-visible:border-[#0A7B4A] placeholder:text-[#3A4D3A]/30 dark:placeholder:text-white/20 text-[#1A2E1A] dark:text-white/90 transition-all';
+    'h-11 rounded-xl border border-[rgba(10,123,74,0.25)] bg-[rgba(245,250,240,0.5)] dark:bg-[rgba(10,123,74,0.08)] backdrop-blur-sm focus-visible:ring-2 focus-visible:ring-[#0A7B4A] focus-visible:ring-offset-0 focus-visible:border-[#0A7B4A] placeholder:text-[#3A4D3A]/30 dark:placeholder:text-white/60 text-[#1A2E1A] dark:text-white/90 transition-all';
 
 // ── Left panel decorative trust points (unchanged) ──────────────────────────────
 const TRUST_POINTS = [
@@ -197,7 +197,7 @@ const SignInForm = memo(({
                 </button>
             </div>
             <div className="text-right -mt-0.5">
-                <button type="button" onClick={onForgotClick} className="text-xs text-[#0A7B4A] hover:underline underline-offset-2 font-medium">
+                <button type="button" onClick={onForgotClick} className="text-xs text-[#0A7B4A] dark:text-[#4ade80] hover:underline underline-offset-2 font-medium">
                     Forgot password?
                 </button>
             </div>
@@ -210,7 +210,7 @@ const SignInForm = memo(({
                 <div className="w-full border-t border-[rgba(10,123,74,0.15)]" />
             </div>
             <div className="relative flex justify-center">
-                <span className="px-3 text-xs uppercase tracking-wider text-[#3A4D3A]/40 dark:text-white/30 bg-white dark:bg-[#0d1a0e]">
+                <span className="px-3 text-xs uppercase tracking-wider text-[#3A4D3A]/40 dark:text-white/50 bg-white dark:bg-[#0d1a0e]">
                     or
                 </span>
             </div>
@@ -623,7 +623,7 @@ export default function SignInPage() {
                     </div>
                     <Link
                         href="/"
-                        className="flex items-center gap-2 text-sm text-white/45 hover:text-white/75 transition-colors w-fit"
+                        className="flex items-center gap-2 text-sm text-white/45 hover:text-white/90 transition-colors w-fit"
                     >
                         <ArrowLeft className="h-3.5 w-3.5" />
                         Back to home
@@ -637,7 +637,7 @@ export default function SignInPage() {
                     <AgroLeafLogo />
                     <Link
                         href="/"
-                        className="flex items-center gap-1.5 text-xs text-[#3A4D3A]/60 dark:text-white/40 hover:text-[#0A7B4A] dark:hover:text-[#4ade80] transition-colors"
+                        className="flex items-center gap-1.5 text-xs text-[#3A4D3A]/60 dark:text-white/60 hover:text-[#0A7B4A] dark:hover:text-[#4ade80] transition-colors"
                     >
                         <ArrowLeft className="h-3.5 w-3.5" />
                         Home
@@ -686,7 +686,7 @@ export default function SignInPage() {
                                         <h1 className="text-xl font-bold text-[#1A2E1A] dark:text-white leading-tight">
                                             {meta.title}
                                         </h1>
-                                        <p className="text-xs text-[#3A4D3A]/60 dark:text-white/40 mt-0.5">
+                                        <p className="text-xs text-[#3A4D3A]/60 dark:text-white/85 mt-0.5">
                                             {meta.subtitle}
                                         </p>
                                     </div>
@@ -735,11 +735,11 @@ export default function SignInPage() {
                             </motion.div>
                         </AnimatePresence>
 
-                        <p className="text-center text-xs text-[#3A4D3A]/40 dark:text-white/25 mt-6">
+                        <p className="text-center text-xs text-[#3A4D3A]/40 dark:text-white/70 mt-6">
                             By signing in, you agree to our{' '}
                             <a href="/terms" className="text-[#0A7B4A] hover:underline">Terms</a>{' '}
                             &{' '}
-                            <a href="/privacy" className="text-[#0A7B4A] hover:underline">Privacy Policy</a>.
+                            <a href="/privacy-policy" className="text-[#0A7B4A] hover:underline">Privacy Policy</a>.
                         </p>
                     </div>
                 </motion.div>
