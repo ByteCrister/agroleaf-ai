@@ -1,22 +1,7 @@
 // app/api/v1/diagnose/route.ts
 import { NextRequest, NextResponse } from "next/server";
 import { getToken } from "next-auth/jwt";
-import { redis } from "@/config/redis"; // existing Redis client
-
-// Rate limit configuration
-const RATE_LIMITS = {
-    PER_MINUTE: { limit: 2, window: 60 },      // 2 requests per minute
-    PER_HOUR: { limit: 5, window: 3600 },    // 5 requests per hour
-};
-
-// Helper: check and consume rate limit
-async function checkRateLimit(userId: string, type: 'minute' | 'hour'): Promise<boolean> {
-    const { limit, window } = RATE_LIMITS[type === 'minute' ? 'PER_MINUTE' : 'PER_HOUR'];
-    const key = `diagnosis:ratelimit:${userId}:${type}`;
-    const current = await redis.incr(key);
-    if (current === 1) await redis.expire(key, window);
-    return current <= limit;
-}
+import { checkRateLimit } from "@/lib/checkRateLimit";
 
 export async function POST(req: NextRequest) {
     // 1. Authenticate user

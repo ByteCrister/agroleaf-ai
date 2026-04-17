@@ -19,6 +19,7 @@ import {
     Sprout,
     BarChart3,
 } from "lucide-react";
+import ReactMarkdown from "react-markdown";
 import { cn } from "@/lib/utils";
 import { plusJakarta, jetbrainsMono } from "@/fonts/google-fonts";
 import { agToast } from "@/components/global/AgroToaster";
@@ -27,7 +28,8 @@ import { agToast } from "@/components/global/AgroToaster";
 // Config
 // ──────────────────────────────────────────────────────────────────
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10 MB
-const ACCEPTED_TYPES = ["image/jpeg", "image/png", "image/bmp"];
+const ACCEPTED_TYPES = ["image/jpeg", "image/png", "image/bmp", "image/webp"];
+const DIAGNOSE_API_URL = `/api/v2/diagnose`
 
 // ──────────────────────────────────────────────────────────────────
 // Types
@@ -163,7 +165,7 @@ export default function DiagnosePage() {
         formData.append("file", selectedFile);
 
         try {
-            const response = await fetch("/api/v1/diagnose", {
+            const response = await fetch(DIAGNOSE_API_URL, {
                 method: "POST",
                 body: formData,
             });
@@ -683,9 +685,33 @@ export default function DiagnosePage() {
                                                     AI Agronomic Advice
                                                 </h3>
                                             </div>
-                                            <p className="text-xs leading-relaxed text-[#3A4D3A]/75 dark:text-white/55 whitespace-pre-wrap">
-                                                {result.ai_feedback}
-                                            </p>
+                                            <div className="text-xs leading-relaxed text-[#3A4D3A]/75 dark:text-white/55 prose prose-sm dark:prose-invert max-w-none">
+                                                <ReactMarkdown
+                                                    components={{
+                                                        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+                                                        h3: ({ node: _node, ...props }) => (
+                                                            <h3 className="text-sm font-bold mt-3 mb-1" {...props} />
+                                                        ),
+
+                                                        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+                                                        strong: ({ node: _node, ...props }) => (
+                                                            <strong className="font-extrabold text-[#1A2E1A] dark:text-white" {...props} />
+                                                        ),
+
+                                                        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+                                                        ul: ({ node: _node, ...props }) => (
+                                                            <ul className="list-disc pl-4 space-y-1" {...props} />
+                                                        ),
+
+                                                        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+                                                        li: ({ node: _node, ...props }) => (
+                                                            <li className="pl-1" {...props} />
+                                                        ),
+                                                    }}
+                                                >
+                                                    {result.ai_feedback}
+                                                </ReactMarkdown>
+                                            </div>
                                         </motion.div>
                                     </div>
 
