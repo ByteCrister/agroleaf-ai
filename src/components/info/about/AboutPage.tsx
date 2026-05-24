@@ -14,14 +14,19 @@ import {
 } from "react-icons/fa";
 import Link from "next/link";
 import { motion } from "framer-motion";
+import { getDatasetStats } from "@/utils/datasetStats";
 
-const STATS = [
-    { icon: Database, label: "Training Images", value: "56,384" },
-    { icon: Layers, label: "Disease Classes", value: "134" },
-    { icon: Brain, label: "Crop Categories", value: "30" },
-];
 
 export default function AboutPage() {
+   // Get dynamic dataset statistics
+    const { totalImages, totalClasses } = getDatasetStats();
+
+    const STATS = [
+        { icon: Database, label: "Training Images", value: totalImages.toLocaleString() },
+        { icon: Layers, label: "Disease Classes", value: totalClasses.toString() },
+        { icon: Brain, label: "Crop Categories", value: cropsData.length.toString() },
+    ];
+
     return (
         <main className="min-h-screen px-4 py-12 md:px-6 lg:px-8">
             <div className="mx-auto max-w-7xl space-y-14">

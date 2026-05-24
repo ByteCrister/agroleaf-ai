@@ -7,206 +7,38 @@ import {
   motion,
   useAnimation,
   useInView,
-  AnimatePresence,
   Variants,
   type Easing,
 } from "framer-motion";
 import {
-  Carousel,
-  CarouselApi,
-  CarouselContent,
-  CarouselItem,
-  CarouselNext,
-  CarouselPrevious,
-} from "@/components/ui/carousel";
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion";
-import {
-  Leaf,
-  Apple,
-  Wheat,
-  Grape,
   Camera,
-  Search,
-  Shield,
-  AlertTriangle,
-  Sprout,
-  Droplets,
-  Tractor,
   ArrowRight,
-  Zap,
   CheckCircle2,
+  Database,
+  Layers,
+  Cpu,
+  BarChart3,
   FlaskConical,
+  Zap,
+  ShieldCheck,
+  TrendingUp,
+  ImageIcon,
+  Filter,
+  Shuffle,
+  Brain,
+  Target,
+  Award,
+  ChevronDown,
+  Hash,
+  Activity,
+  Package,
   Microscope,
-  ScanLine,
-  BrainCircuit,
-  ChevronRight,
-  Star,
-  ChevronLeft,
-  Play,
-  Pause,
+  GitBranch,
+  Clock,
+  Gauge,
 } from "lucide-react";
-import { SiPython, SiTensorflow } from "react-icons/si";
 import { plusJakarta, jetbrainsMono } from "@/fonts/google-fonts";
-
-// ──────────────────────────────────────────────────────────────────
-// Data
-// ──────────────────────────────────────────────────────────────────
-
-const BANNER_SLIDES = [
-  {
-    id: 1,
-    headline: "Detect Disease Before",
-    headlineAccent: "It Spreads",
-    sub: "Upload a single leaf photo and our Vision Transformer AI pinpoints the disease, severity, and treatment — in under 2 seconds.",
-    badge: "98% Model Accuracy",
-    cta: { label: "Start Free Diagnosis", href: "/diagnose" },
-    secondaryCta: { label: "Watch Demo", href: "#demo" },
-    bg: "from-[#0A7B4A] via-[#2C5F2D] to-[#0d3b1a]",
-    image: "/images/crop-fruits/rice-2.jpeg",
-    imageAlt: "Rice crop field",
-    tag: "Rice · 6 Diseases",
-  },
-  {
-    id: 2,
-    headline: "Seven Crops,",
-    headlineAccent: "One Platform",
-    sub: "From paddy fields to apple orchards — AgroLeaf covers rice, tomato, grape, wheat, corn, potato, and apple with expert-level precision.",
-    badge: "7 Crops Supported",
-    cta: { label: "Explore Crops", href: "/crops" },
-    secondaryCta: { label: "See Disease Library", href: "#diseases" },
-    bg: "from-[#2C5F2D] via-[#0D9488] to-[#0a3d2a]",
-    image: "/images/crop-fruits/tomato-1.jpeg",
-    imageAlt: "Tomato crop",
-    tag: "Tomato · 10 Diseases",
-  },
-  {
-    id: 3,
-    headline: "Instant Diagnosis,",
-    headlineAccent: "Organic Solutions",
-    sub: "Every diagnosis comes with targeted organic and chemical treatment options, prevention tips, and actionable follow-up advice.",
-    badge: "< 2s Response Time",
-    cta: { label: "Try It Now", href: "/diagnose" },
-    secondaryCta: { label: "How It Works", href: "#how-it-works" },
-    bg: "from-[#1a4d1b] via-[#0A7B4A] to-[#10B981]/80",
-    image: "/images/crop-fruits/wheat-1.jpeg",
-    imageAlt: "Wheat field",
-    tag: "Wheat · 5 Diseases",
-  },
-];
-
-const CROPS_FRUITS = [
-  { name: "Rice", scientific: "Oryza sativa", image: "/images/crop-fruits/rice-2.jpeg", diseasesCount: 6, description: "Blast, brown spot, sheath blight, tungro, bacterial leaf streak" },
-  { name: "Apple", scientific: "Malus domestica", image: "/images/crop-fruits/apple-1.jpeg", diseasesCount: 4, description: "Scab, black rot, cedar rust, powdery mildew" },
-  { name: "Tomato", scientific: "Solanum lycopersicum", image: "/images/crop-fruits/tomato-1.jpeg", diseasesCount: 10, description: "Early blight, late blight, leaf mold, septoria, etc." },
-  { name: "Grape", scientific: "Vitis vinifera", image: "/images/crop-fruits/grape-1.jpeg", diseasesCount: 4, description: "Black rot, leaf blight, powdery mildew, downy mildew" },
-  { name: "Wheat", scientific: "Triticum aestivum", image: "/images/crop-fruits/wheat-1.jpeg", diseasesCount: 5, description: "Septoria, stripe rust, leaf rust, stem rust, powdery mildew" },
-  { name: "Corn (Maize)", scientific: "Zea mays", image: "/images/crop-fruits/corn-1.jpeg", diseasesCount: 4, description: "Cercospora, common rust, northern leaf blight, smut" },
-  { name: "Potato", scientific: "Solanum tuberosum", image: "/images/crop-fruits/potato-1.jpeg", diseasesCount: 3, description: "Early blight, late blight, healthy" },
-];
-
-const DISEASE_TREE = [
-  {
-    crop: "Apple", icon: Apple,
-    accentLight: "bg-rose-500", accentDark: "from-rose-500 to-red-500",
-    tagColor: "bg-rose-50 text-rose-700 border-rose-200 dark:bg-rose-950/40 dark:text-rose-300 dark:border-rose-800/40",
-    diseases: [
-      { name: "Apple Scab", severity: "High", treatment: "Fungicide + pruning", symptoms: "Olive-green spots on leaves and fruit", prevention: "Plant resistant varieties, remove fallen leaves" },
-      { name: "Black Rot", severity: "Medium", treatment: "Remove infected branches", symptoms: "Purple spots on leaves, fruit rot", prevention: "Prune for air circulation, sanitize tools" },
-      { name: "Cedar Rust", severity: "Medium", treatment: "Fungicide spray", symptoms: "Bright orange spots on leaves", prevention: "Remove nearby cedar trees" },
-      { name: "Powdery Mildew", severity: "Low", treatment: "Sulfur spray", symptoms: "White powdery coating on leaves", prevention: "Avoid overhead watering" },
-    ],
-  },
-  {
-    crop: "Tomato", icon: Leaf,
-    accentLight: "bg-[#0A7B4A]", accentDark: "from-[#0A7B4A] to-[#2C5F2D]",
-    tagColor: "bg-[rgba(10,123,74,0.08)] text-[#0A7B4A] border-[rgba(10,123,74,0.2)] dark:bg-[rgba(10,123,74,0.2)] dark:text-[#4ade80] dark:border-[rgba(10,123,74,0.3)]",
-    diseases: [
-      { name: "Early Blight", severity: "High", treatment: "Copper fungicide", symptoms: "Dark concentric rings on lower leaves", prevention: "Mulch, crop rotation" },
-      { name: "Late Blight", severity: "Critical", treatment: "Remove & destroy plants", symptoms: "Water-soaked lesions with white fuzz", prevention: "Use resistant varieties" },
-      { name: "Leaf Mold", severity: "Low", treatment: "Improve air circulation", symptoms: "Pale green or yellow spots on leaves", prevention: "Space plants properly" },
-      { name: "Septoria Leaf Spot", severity: "Medium", treatment: "Neem oil", symptoms: "Small circular spots with dark borders", prevention: "Water at base, remove infected leaves" },
-      { name: "Tomato Mosaic Virus", severity: "High", treatment: "No cure, remove plants", symptoms: "Mottled green/yellow leaves, stunted growth", prevention: "Clean tools, use virus-free seeds" },
-    ],
-  },
-  {
-    crop: "Grape", icon: Grape,
-    accentLight: "bg-violet-600", accentDark: "from-violet-600 to-indigo-500",
-    tagColor: "bg-violet-50 text-violet-700 border-violet-200 dark:bg-violet-950/40 dark:text-violet-300 dark:border-violet-800/40",
-    diseases: [
-      { name: "Black Rot", severity: "High", treatment: "Fungicide + sanitation", symptoms: "Brown spots on leaves, mummified berries", prevention: "Prune for air flow, remove mummies" },
-      { name: "Powdery Mildew", severity: "Medium", treatment: "Sulfur spray", symptoms: "White powdery growth on all green parts", prevention: "Avoid dense foliage" },
-      { name: "Downy Mildew", severity: "High", treatment: "Copper-based fungicide", symptoms: "Yellow oil spots on leaves, white mold underside", prevention: "Improve air circulation" },
-      { name: "Anthracnose", severity: "Medium", treatment: "Fungicide", symptoms: "Dark sunken lesions on berries", prevention: "Remove infected canes" },
-    ],
-  },
-  {
-    crop: "Wheat", icon: Wheat,
-    accentLight: "bg-amber-500", accentDark: "from-amber-500 to-yellow-500",
-    tagColor: "bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-950/40 dark:text-amber-300 dark:border-amber-800/40",
-    diseases: [
-      { name: "Stripe Rust", severity: "High", treatment: "Resistant varieties", symptoms: "Yellow-orange stripes on leaves", prevention: "Plant resistant cultivars" },
-      { name: "Septoria", severity: "Medium", treatment: "Fungicide at flag leaf", symptoms: "Brown spots with dark centers", prevention: "Crop rotation, residue management" },
-      { name: "Powdery Mildew", severity: "Low", treatment: "Sulfur application", symptoms: "White powdery patches", prevention: "Avoid excess nitrogen" },
-      { name: "Leaf Rust", severity: "High", treatment: "Fungicide", symptoms: "Orange-brown pustules on leaves", prevention: "Early planting, resistant varieties" },
-      { name: "Fusarium Head Blight", severity: "Critical", treatment: "No effective cure", symptoms: "Bleached spikelets, pink mold", prevention: "Rotate crops, use clean seed" },
-    ],
-  },
-  {
-    crop: "Rice", icon: Sprout,
-    accentLight: "bg-teal-500", accentDark: "from-teal-500 to-[#0D9488]",
-    tagColor: "bg-teal-50 text-teal-700 border-teal-200 dark:bg-teal-950/40 dark:text-teal-300 dark:border-teal-800/40",
-    diseases: [
-      { name: "Rice Blast", severity: "High", treatment: "Fungicide + resistant varieties", symptoms: "Diamond-shaped lesions with grey centers", prevention: "Balance nitrogen application" },
-      { name: "Brown Spot", severity: "Medium", treatment: "Seed treatment", symptoms: "Small brown circular spots", prevention: "Use certified seeds" },
-      { name: "Sheath Blight", severity: "High", treatment: "Fungicide", symptoms: "Greenish-grey lesions on leaf sheaths", prevention: "Avoid dense planting" },
-      { name: "Bacterial Leaf Streak", severity: "Medium", treatment: "Copper compounds", symptoms: "Yellowish streaks between veins", prevention: "Drain fields periodically" },
-      { name: "Tungro Virus", severity: "High", treatment: "Vector control", symptoms: "Yellow-orange discoloration, stunting", prevention: "Control leafhoppers" },
-    ],
-  },
-  {
-    crop: "Corn (Maize)", icon: Leaf,
-    accentLight: "bg-yellow-500", accentDark: "from-yellow-500 to-amber-500",
-    tagColor: "bg-yellow-50 text-yellow-700 border-yellow-200 dark:bg-yellow-950/40 dark:text-yellow-300 dark:border-yellow-800/40",
-    diseases: [
-      { name: "Common Rust", severity: "Medium", treatment: "Fungicide", symptoms: "Brick-red pustules on leaves", prevention: "Plant resistant hybrids" },
-      { name: "Northern Leaf Blight", severity: "High", treatment: "Fungicide", symptoms: "Long cigar-shaped gray-green lesions", prevention: "Crop rotation, tillage" },
-      { name: "Southern Corn Rust", severity: "High", treatment: "Fungicide", symptoms: "Small circular orange pustules", prevention: "Early planting" },
-      { name: "Gray Leaf Spot", severity: "Medium", treatment: "Fungicide", symptoms: "Rectangular gray lesions", prevention: "Residue management" },
-      { name: "Maize Dwarf Mosaic", severity: "Medium", treatment: "No cure", symptoms: "Mosaic pattern on leaves, stunting", prevention: "Control aphid vectors" },
-    ],
-  },
-  {
-    crop: "Potato", icon: Sprout,
-    accentLight: "bg-stone-500", accentDark: "from-stone-500 to-stone-600",
-    tagColor: "bg-stone-50 text-stone-700 border-stone-200 dark:bg-stone-900/40 dark:text-stone-300 dark:border-stone-700/40",
-    diseases: [
-      { name: "Early Blight", severity: "High", treatment: "Chlorothalonil", symptoms: "Dark concentric spots on older leaves", prevention: "Crop rotation, avoid overhead irrigation" },
-      { name: "Late Blight", severity: "Critical", treatment: "Destroy infected plants", symptoms: "Water-soaked lesions, white mold on undersides", prevention: "Use certified seed potatoes" },
-      { name: "Potato Virus Y", severity: "High", treatment: "No cure", symptoms: "Mosaic, leaf drop, stunting", prevention: "Control aphids, use resistant varieties" },
-      { name: "Blackleg", severity: "Medium", treatment: "Destroy infected plants", symptoms: "Black rotting stems, wilting", prevention: "Use disease-free seed" },
-    ],
-  },
-];
-
-const HOW_IT_WORKS = [
-  { step: "01", icon: Camera, title: "Upload a Photo", desc: "Take a clear photo of the affected leaf, fruit, or stem and upload it to our platform." },
-  { step: "02", icon: ScanLine, title: "AI Scans the Image", desc: "Our Vision Transformer model analyzes 50+ visual markers across 38 disease classes." },
-  { step: "03", icon: BrainCircuit, title: "Disease Identified", desc: "Get an instant diagnosis with confidence score, severity level, and full breakdown." },
-  { step: "04", icon: FlaskConical, title: "Treatment Plan", desc: "Receive organic and chemical treatment options, prevention tips, and follow-up advice." },
-];
-
-// Stats with numeric values for counter animation
-const STATS = [
-  { numericValue: 38, suffix: "+", label: "Disease Classes", icon: Microscope },
-  { numericValue: 7, suffix: "", label: "Crops Supported", icon: Sprout },
-  { numericValue: 98, suffix: "%", label: "Model Accuracy", icon: Star },
-  { numericValue: 2, prefix: "< ", suffix: "s", label: "Diagnosis Time", icon: Zap },
-];
+import { BannerCarousel } from "./BannerCarousel";
 
 // ──────────────────────────────────────────────────────────────────
 // Animation helpers
@@ -220,20 +52,18 @@ const fadeUp = (delay = 0) => ({
 
 const staggerContainer: Variants = {
   hidden: { opacity: 0 },
-  show: { opacity: 1, transition: { staggerChildren: 0.09, delayChildren: 0.15 } },
+  show: {
+    opacity: 1,
+    transition: { staggerChildren: 0.09, delayChildren: 0.15 },
+  },
 };
 const staggerItem: Variants = {
   hidden: { opacity: 0, y: 22 },
-  show: { opacity: 1, y: 0, transition: { duration: 0.5, ease: [0.16, 1, 0.3, 1] } },
-};
-
-const severityStyle = (s: string) => {
-  switch (s) {
-    case "Critical": return "bg-red-50 text-red-700 border border-red-200 dark:bg-red-950/40 dark:text-red-300 dark:border-red-800/40";
-    case "High": return "bg-orange-50 text-orange-700 border border-orange-200 dark:bg-orange-950/40 dark:text-orange-300 dark:border-orange-800/40";
-    case "Medium": return "bg-amber-50 text-amber-700 border border-amber-200 dark:bg-amber-950/30 dark:text-amber-300 dark:border-amber-800/40";
-    default: return "bg-[rgba(10,123,74,0.07)] text-[#0A7B4A] border border-[rgba(10,123,74,0.2)] dark:bg-[rgba(10,123,74,0.2)] dark:text-[#4ade80] dark:border-[rgba(10,123,74,0.3)]";
-  }
+  show: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.5, ease: [0.16, 1, 0.3, 1] },
+  },
 };
 
 // ──────────────────────────────────────────────────────────────────
@@ -241,33 +71,278 @@ const severityStyle = (s: string) => {
 // ──────────────────────────────────────────────────────────────────
 function useCounter(target: number, duration = 1800, start = false) {
   const [count, setCount] = useState(0);
-
   useEffect(() => {
     if (!start) return;
     let startTime: number | null = null;
     const step = (timestamp: number) => {
       if (!startTime) startTime = timestamp;
       const progress = Math.min((timestamp - startTime) / duration, 1);
-      // Ease out cubic
       const eased = 1 - Math.pow(1 - progress, 3);
       setCount(Math.floor(eased * target));
       if (progress < 1) requestAnimationFrame(step);
     };
     requestAnimationFrame(step);
   }, [target, duration, start]);
-
   return count;
 }
 
 // ──────────────────────────────────────────────────────────────────
-// Stat Card with animated counter
+// Model Stats Data (from training script)
 // ──────────────────────────────────────────────────────────────────
-function StatCard({ numericValue, suffix, prefix, label, icon: Icon, delay }: {
-  numericValue: number; suffix: string; prefix?: string; label: string; icon: React.ElementType; delay: number;
+const MODEL_STATS = [
+  { value: 120, suffix: "", label: "Plant Disease Classes", icon: Hash, color: "#0A7B4A" },
+  { value: 61, suffix: "K+", label: "Training Images", icon: ImageIcon, color: "#2C5F2D" },
+  { value: 40, suffix: "", label: "Training Epochs", icon: Activity, color: "#10B981" },
+  { value: 224, suffix: "px", label: "Input Resolution", icon: Gauge, color: "#0D9488" },
+];
+
+const ACCURACY_METRICS = [
+  { label: "Val Accuracy", value: "95.4%", sub: "Weighted F1: 0.954", color: "#0A7B4A" },
+  { label: "Test Accuracy", value: "93.8%", sub: "Macro F1: 0.934", color: "#2C5F2D" },
+  { label: "Hold-out Test", value: "6,100+", sub: "Never seen by model", color: "#10B981" },
+  { label: "Model Size", value: "~360MB", sub: "ConvNext-Base 224", color: "#0D9488" },
+];
+
+// Pipeline steps derived from training script
+const PIPELINE_STEPS = [
+  {
+    phase: "01",
+    icon: Database,
+    title: "Dataset Collection",
+    subtitle: "AgroLeafAI v3",
+    color: "#0A7B4A",
+    bg: "rgba(10,123,74,0.08)",
+    border: "rgba(10,123,74,0.2)",
+    details: [
+      { label: "Raw Classes", value: "120+" },
+      { label: "Total Images", value: "~61,000" },
+      { label: "File Formats", value: "JPG, PNG, WebP" },
+      { label: "Source", value: "Kaggle Curated" },
+    ],
+    description:
+      "A diverse, real-world dataset collected across 24 crop types, covering both leaf conditions and fruit quality — including healthy, diseased, and rotten samples.",
+  },
+  {
+    phase: "02",
+    icon: Filter,
+    title: "Data Cleaning",
+    subtitle: "Deduplication & Merge",
+    color: "#2C5F2D",
+    bg: "rgba(44,95,45,0.08)",
+    border: "rgba(44,95,45,0.2)",
+    details: [
+      { label: "Dedup Strategy", value: "SHA-1 hash (65KB)" },
+      { label: "Name Normalise", value: "Regex lowercase" },
+      { label: "Min Samples", value: "5 per class" },
+      { label: "Invalid Images", value: "Auto-skipped" },
+    ],
+    description:
+      "Exact duplicate images are removed via SHA-1 hashing. Class names are normalised and merged. Classes with fewer than 5 samples are forced to train-only.",
+  },
+  {
+    phase: "03",
+    icon: GitBranch,
+    title: "Three-Way Split",
+    subtitle: "Stratified Sampling",
+    color: "#0D9488",
+    bg: "rgba(13,148,136,0.08)",
+    border: "rgba(13,148,136,0.2)",
+    details: [
+      { label: "Hold-out Test", value: "10%" },
+      { label: "Validation", value: "20% of 90%" },
+      { label: "Train Set", value: "~72%" },
+      { label: "Stratified", value: "Yes (per class)" },
+    ],
+    description:
+      "A hard hold-out test set (10%) is carved out before any training. The remaining 90% is split into train/val. The model never touches the test set during training.",
+  },
+  {
+    phase: "04",
+    icon: Shuffle,
+    title: "Augmentation",
+    subtitle: "RandAugment + CutMix",
+    color: "#F59E0B",
+    bg: "rgba(245,158,11,0.08)",
+    border: "rgba(245,158,11,0.2)",
+    details: [
+      { label: "RandAugment", value: "9 magnitude, 2 ops" },
+      { label: "CutMix", value: "α=0.8, p=0.2" },
+      { label: "MixUp", value: "α=0.6, p=0.2" },
+      { label: "Random Erase", value: "p=0.2, scale 2–10%" },
+    ],
+    description:
+      "Strong pre-resize augmentation (flip, rotation ±30°, colour jitter) is applied to all training images. CutMix and MixUp begin at epoch 5 to prevent over-regularisation.",
+  },
+  {
+    phase: "05",
+    icon: Brain,
+    title: "Model Architecture",
+    subtitle: "ConvNext-Base 224",
+    color: "#0A7B4A",
+    bg: "rgba(10,123,74,0.08)",
+    border: "rgba(10,123,74,0.2)",
+    details: [
+      { label: "Backbone", value: "facebook/convnext-base-224" },
+      { label: "Custom Head", value: "LayerNorm → Dropout → Linear(512) → GELU → Linear(120)" },
+      { label: "Dropout", value: "0.4 backbone / 0.2 head" },
+      { label: "Parameters", value: "~89M total" },
+    ],
+    description:
+      "Pretrained ConvNext-Base with a two-layer MLP classification head. The entire backbone is fine-tuned with a differential learning rate: 1e-5 for backbone, 1e-3 for the head.",
+  },
+  {
+    phase: "06",
+    icon: Zap,
+    title: "Training Strategy",
+    subtitle: "Focal Loss + AdamW",
+    color: "#2C5F2D",
+    bg: "rgba(44,95,45,0.08)",
+    border: "rgba(44,95,45,0.2)",
+    details: [
+      { label: "Loss", value: "Focal (γ=2.0) + Label Smoothing 0.1" },
+      { label: "Optimiser", value: "AdamW, WD=0.02" },
+      { label: "Scheduler", value: "Warmup (2 ep) → Cosine" },
+      { label: "Grad Accum", value: "2 steps, clip=1.0" },
+    ],
+    description:
+      "Focal Loss down-weights easy examples; class weights are √(N/nₖ) to handle imbalance. A 2-epoch linear warmup is followed by cosine annealing to η_min=1e-7.",
+  },
+  {
+    phase: "07",
+    icon: Target,
+    title: "Evaluation",
+    subtitle: "Weighted & Macro F1",
+    color: "#0D9488",
+    bg: "rgba(13,148,136,0.08)",
+    border: "rgba(13,148,136,0.2)",
+    details: [
+      { label: "Primary Metric", value: "Val Macro-F1" },
+      { label: "Early Stop", value: "Patience = 7 epochs" },
+      { label: "Best Checkpoint", value: "Macro-F1 peak" },
+      { label: "Reports", value: "Val + Test classification" },
+    ],
+    description:
+      "Model is checkpointed whenever val macro-F1 improves. Early stopping triggers after 7 epochs without improvement. Final evaluation runs on the held-out test set.",
+  },
+  {
+    phase: "08",
+    icon: Microscope,
+    title: "Temperature Calibration",
+    subtitle: "LBFGS Optimisation",
+    color: "#F59E0B",
+    bg: "rgba(245,158,11,0.08)",
+    border: "rgba(245,158,11,0.2)",
+    details: [
+      { label: "Method", value: "Temperature Scaling" },
+      { label: "Optimiser", value: "LBFGS (50 iter)" },
+      { label: "Data", value: "Validation logits" },
+      { label: "Output", value: "temperature.json" },
+    ],
+    description:
+      "Post-training temperature scaling calibrates model confidence on real-world inputs. The optimal temperature T* is learned on validation logits using LBFGS.",
+  },
+  {
+    phase: "09",
+    icon: Package,
+    title: "ONNX Export",
+    subtitle: "Simplified & Runtime-ready",
+    color: "#0A7B4A",
+    bg: "rgba(10,123,74,0.08)",
+    border: "rgba(10,123,74,0.2)",
+    details: [
+      { label: "Opset", value: "18" },
+      { label: "Simplification", value: "onnxsim" },
+      { label: "Input", value: "pixel_values [B,3,224,224]" },
+      { label: "Smoke Test", value: "ONNX Runtime CPU" },
+    ],
+    description:
+      "The final model is exported to ONNX (opset 18) with dynamic batch size, simplified via onnxsim, and smoke-tested with ONNX Runtime before Kaggle upload.",
+  },
+];
+
+// Data cleaning insight cards
+const DATASET_INSIGHTS = [
+  {
+    icon: ImageIcon,
+    label: "Image Sources",
+    value: "24 crop types",
+    sub: "Leaves, fruits, vegetables",
+    color: "#0A7B4A",
+  },
+  {
+    icon: Hash,
+    label: "Disease Classes",
+    value: "120 total",
+    sub: "After normalisation & merge",
+    color: "#2C5F2D",
+  },
+  {
+    icon: ShieldCheck,
+    label: "Data Integrity",
+    value: "SHA-1 dedup",
+    sub: "Exact duplicates removed",
+    color: "#10B981",
+  },
+  {
+    icon: TrendingUp,
+    label: "Class Balance",
+    value: "√(N/nₖ) weights",
+    sub: "Imbalance handled via sampling",
+    color: "#0D9488",
+  },
+  {
+    icon: Clock,
+    label: "Augmentation",
+    value: "6 strategies",
+    sub: "Flip, rotate, jitter, erase, mix",
+    color: "#F59E0B",
+  },
+  {
+    icon: FlaskConical,
+    label: "Test Isolation",
+    value: "10% held-out",
+    sub: "Never seen during training",
+    color: "#0A7B4A",
+  },
+];
+
+// Class distribution by crop group
+const CROP_GROUPS = [
+  { crop: "Tomato", classes: 12, healthy: 2, diseased: 10, bar: 100 },
+  { crop: "Soybean", classes: 9, healthy: 1, diseased: 8, bar: 75 },
+  { crop: "Rice", classes: 5, healthy: 1, diseased: 4, bar: 42 },
+  { crop: "Cucumber", classes: 8, healthy: 2, diseased: 6, bar: 67 },
+  { crop: "Sugarcane", classes: 5, healthy: 1, diseased: 4, bar: 42 },
+  { crop: "Cassava", classes: 5, healthy: 1, diseased: 4, bar: 42 },
+  { crop: "Chili", classes: 5, healthy: 1, diseased: 4, bar: 42 },
+  { crop: "Coffee", classes: 4, healthy: 1, diseased: 3, bar: 33 },
+  { crop: "Wheat", classes: 4, healthy: 1, diseased: 3, bar: 33 },
+  { crop: "Grape", classes: 6, healthy: 2, diseased: 4, bar: 50 },
+  { crop: "Corn", classes: 4, healthy: 1, diseased: 3, bar: 33 },
+  { crop: "Tea", classes: 6, healthy: 1, diseased: 5, bar: 50 },
+];
+
+// ──────────────────────────────────────────────────────────────────
+// StatCounter component
+// ──────────────────────────────────────────────────────────────────
+function StatCounter({
+  value,
+  suffix,
+  label,
+  icon: Icon,
+  color,
+  delay,
+}: {
+  value: number;
+  suffix: string;
+  label: string;
+  icon: React.ElementType;
+  color: string;
+  delay: number;
 }) {
   const ref = useRef(null);
   const inView = useInView(ref, { once: true, amount: 0.5 });
-  const count = useCounter(numericValue, 1600, inView);
+  const count = useCounter(value, 1600, inView);
 
   return (
     <motion.div
@@ -276,376 +351,24 @@ function StatCard({ numericValue, suffix, prefix, label, icon: Icon, delay }: {
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
       transition={{ delay, duration: 0.55 }}
-      className="glass-card rounded-2xl px-5 py-6 flex flex-col items-center text-center gap-3 group hover:border-[rgba(10,123,74,0.5)] transition-all duration-300 cursor-default"
+      className="glass-card rounded-2xl px-5 py-6 flex flex-col items-center text-center gap-3 group hover:shadow-[0_12px_32px_rgba(10,123,74,0.12)] transition-all duration-300"
     >
-      <div className="flex items-center justify-center h-12 w-12 rounded-2xl bg-[rgba(10,123,74,0.1)] dark:bg-[rgba(10,123,74,0.2)] group-hover:bg-[#0A7B4A] transition-colors duration-300">
-        <Icon className="h-5 w-5 text-[#0A7B4A] dark:text-[#4ade80] group-hover:text-white transition-colors" />
+      <div
+        className="flex items-center justify-center h-12 w-12 rounded-2xl transition-colors duration-300 group-hover:scale-110"
+        style={{ background: `${color}18` }}
+      >
+        <Icon className="h-5 w-5" style={{ color }} />
       </div>
-      <p className={`${jetbrainsMono.className} text-3xl font-bold text-[#1A2E1A] dark:text-white tabular-nums`}>
-        {prefix ?? ""}{count}{suffix}
+      <p
+        className={`${jetbrainsMono.className} text-3xl font-bold text-[#1A2E1A] tabular-nums`}
+      >
+        {count}
+        {suffix}
       </p>
-      <p className="text-xs font-semibold text-[#3A4D3A]/60 dark:text-white/45 tracking-wide">{label}</p>
+      <p className="text-xs font-semibold text-[#3A4D3A]/60 tracking-wide">
+        {label}
+      </p>
     </motion.div>
-  );
-}
-
-// ──────────────────────────────────────────────────────────────────
-// Banner Carousel Component
-// ──────────────────────────────────────────────────────────────────
-export function BannerCarousel() {
-  const [current, setCurrent] = useState(0);
-  const [isPlaying, setIsPlaying] = useState(true);
-  const [direction, setDirection] = useState(1);
-  const total = BANNER_SLIDES.length;
-  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
-
-  const goTo = (idx: number, dir = 1) => {
-    setDirection(dir);
-    setCurrent((idx + total) % total);
-  };
-
-  const startAuto = () => {
-    if (intervalRef.current) clearInterval(intervalRef.current);
-    intervalRef.current = setInterval(() => {
-      setDirection(1);
-      setCurrent((c) => (c + 1) % total);
-    }, 5800);
-  };
-
-  useEffect(() => {
-    if (isPlaying) startAuto();
-    else if (intervalRef.current) clearInterval(intervalRef.current);
-    return () => { if (intervalRef.current) clearInterval(intervalRef.current); };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isPlaying]);
-
-  const slide = BANNER_SLIDES[current];
-
-  const imgVariants = {
-    enter: (dir: number) => ({ opacity: 0, scale: 1.08, x: dir > 0 ? 60 : -60 }),
-    center: { opacity: 1, scale: 1, x: 0 },
-    exit: (dir: number) => ({ opacity: 0, scale: 0.95, x: dir > 0 ? -40 : 40 }),
-  };
-
-  const textVariants = {
-    enter: { opacity: 0, y: 36 },
-    center: { opacity: 1, y: 0 },
-    exit: { opacity: 0, y: -20 },
-  };
-
-  return (
-    <section className="relative w-full overflow-hidden">
-      {/* ── MAIN SLIDE AREA ── */}
-      <div className="relative h-[90vh] min-h-150 max-h-225 flex flex-col">
-
-        {/* ── LAYER 0: Full-bleed crop image ── */}
-        <div className="absolute inset-0 z-0 overflow-hidden">
-          <AnimatePresence custom={direction} mode="sync">
-            <motion.div
-              key={`img-${current}`}
-              custom={direction}
-              variants={imgVariants}
-              initial="enter"
-              animate="center"
-              exit="exit"
-              transition={{ duration: 1.05, ease: [0.25, 0.46, 0.45, 0.94] }}
-              className="absolute inset-0"
-            >
-              <Image
-                src={slide.image}
-                alt={slide.imageAlt}
-                fill
-                sizes="100vw"
-                priority={current === 0}
-                className="object-cover object-center"
-              />
-            </motion.div>
-          </AnimatePresence>
-        </div>
-
-        {/* ── LAYER 1: Left-to-right gradient overlay ──
-            Strong dark on the left where text lives → fully transparent on the right
-            so the crop image is fully visible on the right side.
-            Light mode: slightly less opaque. Dark mode: slightly more opaque. ── */}
-        <div
-          className="absolute inset-0 z-10 pointer-events-none"
-          style={{
-            background:
-              "linear-gradient(to right, rgba(5,14,6,0.82) 0%, rgba(5,14,6,0.68) 30%, rgba(5,14,6,0.35) 55%, rgba(5,14,6,0.08) 75%, transparent 100%)",
-          }}
-        />
-
-        {/* ── LAYER 2: Subtle bottom vignette — keeps nav bar readable ── */}
-        <div
-          className="absolute inset-x-0 bottom-0 z-10 pointer-events-none"
-          style={{
-            height: "220px",
-            background:
-              "linear-gradient(to top, rgba(5,14,6,0.65) 0%, rgba(5,14,6,0.3) 50%, transparent 100%)",
-          }}
-        />
-
-        {/* ── LAYER 3: Noise / grain texture ── */}
-        <div
-          className="absolute inset-0 z-10 opacity-[0.025] pointer-events-none"
-          style={{
-            backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='1'/%3E%3C/svg%3E")`,
-            backgroundSize: "200px 200px",
-          }}
-        />
-
-        {/* ── LAYER 4: Dot-grid accent (very subtle, only on the left text area) ── */}
-        <div
-          className="absolute inset-y-0 left-0 z-10 opacity-[0.035] pointer-events-none"
-          style={{
-            width: "55%",
-            backgroundImage: "radial-gradient(circle, rgba(255,255,255,0.9) 1px, transparent 1px)",
-            backgroundSize: "40px 40px",
-          }}
-        />
-
-        {/* ── LAYER 5: Top progress bar ── */}
-        <div className="absolute top-0 left-0 right-0 h-0.75 bg-white/10 z-30">
-          {isPlaying && (
-            <motion.div
-              key={`bar-${current}`}
-              initial={{ width: "0%" }}
-              animate={{ width: "100%" }}
-              transition={{ duration: 5.8, ease: "linear" }}
-              className="h-full bg-linear-to-r from-[#10B981] via-[#4ade80] to-[#86efac]"
-            />
-          )}
-        </div>
-
-        {/* ── LAYER 6: Slide index strip — left vertical ── */}
-        <div className="absolute left-5 md:left-8 top-1/2 -translate-y-1/2 z-20 hidden md:flex flex-col items-center gap-3">
-          {BANNER_SLIDES.map((_, i) => (
-            <button
-              key={i}
-              onClick={() => { goTo(i, i > current ? 1 : -1); setIsPlaying(false); }}
-              aria-label={`Slide ${i + 1}`}
-              className={`transition-all duration-500 rounded-full ${i === current
-                  ? "h-10 w-0.75 bg-[#10B981]"
-                  : "h-4 w-0.75 bg-white/30 hover:bg-white/55"
-                }`}
-            />
-          ))}
-        </div>
-
-        {/* ── LAYER 7: MAIN TEXT CONTENT ── */}
-        <div className="relative z-20 flex flex-col justify-end h-full pb-24 md:pb-20 px-6 md:px-14 lg:px-20 max-w-7xl mx-auto w-full">
-
-          {/* Slide number watermark — top right */}
-          <div
-            className={`${jetbrainsMono.className} absolute top-7 right-7 text-[11px] font-bold text-white/30 tracking-[0.2em] hidden md:block`}
-          >
-            {String(current + 1).padStart(2, "0")}{" "}
-            <span className="text-white/15">/ {String(total).padStart(2, "0")}</span>
-          </div>
-
-          {/* Tag pill */}
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={`tag-${current}`}
-              variants={textVariants}
-              initial="enter"
-              animate="center"
-              exit="exit"
-              transition={{ duration: 0.45, delay: 0.05 }}
-              className="flex items-center gap-3 mb-5"
-            >
-              <span className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-black/30 border border-white/20 text-white/90 text-[11px] font-bold tracking-widest uppercase backdrop-blur-sm">
-                <span className="h-1.5 w-1.5 rounded-full bg-[#10B981] animate-pulse" />
-                {slide.badge}
-              </span>
-              <span className="h-px w-12 bg-white/25" />
-              <span className="inline-flex items-center gap-1.5 text-[11px] font-semibold text-white/50 tracking-wide">
-                <Sprout className="h-3 w-3 text-[#10B981]" />
-                {slide.tag}
-              </span>
-            </motion.div>
-          </AnimatePresence>
-
-          {/* Headline */}
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={`headline-${current}`}
-              variants={textVariants}
-              initial="enter"
-              animate="center"
-              exit="exit"
-              transition={{ duration: 0.55, ease: [0.16, 1, 0.3, 1], delay: 0.1 }}
-            >
-              <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-extrabold tracking-tight leading-[1.02] text-white max-w-3xl drop-shadow-[0_2px_12px_rgba(0,0,0,0.4)]">
-                {slide.headline}
-                <br />
-                <span className="text-transparent bg-clip-text bg-linear-to-r from-[#10B981] via-[#4ade80] to-[#86efac]">
-                  {slide.headlineAccent}
-                </span>
-              </h1>
-            </motion.div>
-          </AnimatePresence>
-
-          {/* Divider line */}
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={`divider-${current}`}
-              initial={{ scaleX: 0, opacity: 0 }}
-              animate={{ scaleX: 1, opacity: 1 }}
-              exit={{ scaleX: 0, opacity: 0 }}
-              transition={{ duration: 0.5, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
-              className="origin-left mt-6 mb-5 w-24 h-0.5 bg-linear-to-r from-[#10B981] to-transparent"
-            />
-          </AnimatePresence>
-
-          {/* Sub + CTAs row */}
-          <div className="flex flex-col md:flex-row md:items-end gap-8">
-            {/* Sub */}
-            <AnimatePresence mode="wait">
-              <motion.p
-                key={`sub-${current}`}
-                variants={textVariants}
-                initial="enter"
-                animate="center"
-                exit="exit"
-                transition={{ duration: 0.5, delay: 0.18 }}
-                className="text-base md:text-lg text-white/65 leading-relaxed max-w-sm font-normal drop-shadow-[0_1px_4px_rgba(0,0,0,0.5)]"
-              >
-                {slide.sub}
-              </motion.p>
-            </AnimatePresence>
-
-            {/* CTAs */}
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={`ctas-${current}`}
-                variants={textVariants}
-                initial="enter"
-                animate="center"
-                exit="exit"
-                transition={{ duration: 0.45, delay: 0.26 }}
-                className="flex flex-wrap gap-3 md:ml-auto shrink-0"
-              >
-                <Link href={slide.cta.href}>
-                  <motion.button
-                    whileHover={{ scale: 1.04, y: -2 }}
-                    whileTap={{ scale: 0.96 }}
-                    className="inline-flex items-center gap-2.5 px-7 py-4 rounded-2xl text-[#0A7B4A] font-extrabold text-sm bg-white shadow-[0_8px_32px_rgba(0,0,0,0.35)] hover:shadow-[0_12px_40px_rgba(0,0,0,0.45)] transition-all"
-                  >
-                    <Camera className="h-4 w-4" />
-                    {slide.cta.label}
-                    <ArrowRight className="h-4 w-4" />
-                  </motion.button>
-                </Link>
-                <Link href={slide.secondaryCta.href}>
-                  <motion.button
-                    whileHover={{ scale: 1.03, y: -2 }}
-                    whileTap={{ scale: 0.97 }}
-                    className="inline-flex items-center gap-2 px-6 py-4 rounded-2xl font-semibold text-sm text-white border border-white/25 bg-white/10 hover:bg-white/18 transition-all backdrop-blur-md"
-                  >
-                    {slide.secondaryCta.label}
-                    <ChevronRight className="h-4 w-4 opacity-60" />
-                  </motion.button>
-                </Link>
-              </motion.div>
-            </AnimatePresence>
-          </div>
-        </div>
-
-        {/* ── LAYER 8: Bottom nav controls bar ── */}
-        <div className="absolute bottom-0 left-0 right-0 z-20 border-t border-white/10 backdrop-blur-md bg-black/25">
-          <div className="max-w-7xl mx-auto px-6 md:px-14 lg:px-20 py-4 flex items-center justify-between gap-4">
-
-            {/* Mobile dots */}
-            <div className="flex items-center gap-2 md:hidden">
-              {BANNER_SLIDES.map((_, i) => (
-                <button
-                  key={i}
-                  onClick={() => { goTo(i, i > current ? 1 : -1); setIsPlaying(false); }}
-                  className={`rounded-full transition-all duration-300 ${i === current ? "w-6 h-2 bg-[#10B981]" : "w-2 h-2 bg-white/30"
-                    }`}
-                />
-              ))}
-            </div>
-
-            {/* Slide thumbnails — desktop */}
-            <div className="hidden md:flex items-center gap-3">
-              {BANNER_SLIDES.map((s, i) => (
-                <button
-                  key={i}
-                  onClick={() => { goTo(i, i > current ? 1 : -1); setIsPlaying(false); }}
-                  className={`relative overflow-hidden rounded-xl transition-all duration-400 ${i === current
-                      ? "ring-2 ring-[#10B981] ring-offset-1 ring-offset-transparent scale-105"
-                      : "opacity-50 hover:opacity-75 scale-100"
-                    }`}
-                  style={{ width: 64, height: 40 }}
-                  aria-label={`Slide ${i + 1}: ${s.headlineAccent}`}
-                >
-                  <Image
-                    src={s.image}
-                    alt={s.imageAlt}
-                    fill
-                    sizes="64px"
-                    className="object-cover"
-                    loading="eager"
-                  />
-                  {i === current && (
-                    <div className="absolute inset-0 bg-[#10B981]/20" />
-                  )}
-                </button>
-              ))}
-            </div>
-
-            {/* Right controls */}
-            <div className="flex items-center gap-2 ml-auto">
-              <button
-                onClick={() => setIsPlaying(!isPlaying)}
-                className="p-2.5 rounded-xl bg-white/10 border border-white/15 hover:bg-white/20 transition-colors"
-                aria-label={isPlaying ? "Pause" : "Play"}
-              >
-                {isPlaying
-                  ? <Pause className="h-3.5 w-3.5 text-white" />
-                  : <Play className="h-3.5 w-3.5 text-white" />}
-              </button>
-              <div className="w-px h-5 bg-white/15" />
-              <button
-                onClick={() => { goTo(current - 1, -1); setIsPlaying(false); }}
-                className="p-2.5 rounded-xl bg-white/10 border border-white/15 hover:bg-white/20 transition-colors"
-                aria-label="Previous"
-              >
-                <ChevronLeft className="h-4 w-4 text-white" />
-              </button>
-              <button
-                onClick={() => { goTo(current + 1, 1); setIsPlaying(false); }}
-                className="p-2.5 rounded-xl bg-white/10 border border-white/15 hover:bg-white/20 transition-colors"
-                aria-label="Next"
-              >
-                <ChevronRight className="h-4 w-4 text-white" />
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* ── Trust bar ── */}
-      <div className="bg-[rgba(10,123,74,0.06)] dark:bg-[rgba(10,123,74,0.1)] border-b border-[rgba(10,123,74,0.12)] py-4">
-        <div className="container mx-auto max-w-5xl px-6">
-          <div className="flex flex-wrap justify-center gap-6 text-sm text-[#3A4D3A]/55 dark:text-white/35">
-            {[
-              { icon: <SiTensorflow className="text-orange-500 h-4 w-4" />, label: "TensorFlow" },
-              { icon: <SiPython className="text-blue-500 h-4 w-4" />, label: "PyTorch" },
-              { icon: <Shield className="text-[#0A7B4A] h-4 w-4" />, label: "98% Accuracy" },
-              { icon: <Zap className="text-amber-500 h-4 w-4" />, label: "< 2s Response" },
-              { icon: <CheckCircle2 className="text-[#10B981] h-4 w-4" />, label: "Free for Farmers" },
-            ].map(({ icon, label }) => (
-              <span key={label} className="flex items-center gap-2 font-semibold">
-                {icon} {label}
-              </span>
-            ))}
-          </div>
-        </div>
-      </div>
-    </section>
   );
 }
 
@@ -653,7 +376,6 @@ export function BannerCarousel() {
 // Main Component
 // ──────────────────────────────────────────────────────────────────
 export default function HomePage() {
-  const [cropApi, setCropApi] = useState<CarouselApi | null>(null);
   const controls = useAnimation();
   const ref = useRef(null);
   const inView = useInView(ref, { once: true, amount: 0.15 });
@@ -662,300 +384,457 @@ export default function HomePage() {
     if (inView) controls.start("show");
   }, [controls, inView]);
 
-  useEffect(() => {
-    if (!cropApi) return;
-    const interval = setInterval(() => cropApi.scrollNext(), 4200);
-    return () => clearInterval(interval);
-  }, [cropApi]);
-
   return (
     <main
-      className={`${plusJakarta.className} min-h-screen overflow-x-hidden bg-linear-to-b from-[#f0f7f2] via-[#f8fdf9] to-white dark:from-[#060e07] dark:via-[#0a120b] dark:to-[#0d1a0e]`}
+      className={`${plusJakarta.className} min-h-screen overflow-x-hidden`}
+      style={{
+        background: "linear-gradient(160deg, #f0f7f2 0%, #f8fdf9 40%, #ffffff 100%)",
+      }}
     >
-      {/* Global glass card styles — only what Tailwind can't express */}
       <style>{`
         .glass-card {
-          background: rgba(255,255,255,0.78);
+          background: rgba(255, 255, 255, 0.82);
           backdrop-filter: blur(16px);
-          border: 1px solid rgba(10,123,74,0.18);
+          border: 1px solid rgba(10, 123, 74, 0.15);
         }
-        .dark .glass-card {
-          background: rgba(13,26,14,0.75);
-          border: 1px solid rgba(10,123,74,0.28);
+        .glass-card-strong {
+          background: rgba(255, 255, 255, 0.95);
+          backdrop-filter: blur(20px);
+          border: 1px solid rgba(10, 123, 74, 0.18);
+          box-shadow: 0 4px 24px rgba(10, 123, 74, 0.06);
         }
-        .crop-card:hover {
-          border-color: rgba(10,123,74,0.45);
-          box-shadow: 0 12px 40px rgba(10,123,74,0.13);
+        .pipeline-connector {
+          background: linear-gradient(180deg, rgba(10,123,74,0.25) 0%, rgba(10,123,74,0.08) 100%);
         }
-        .dark .crop-card:hover {
-          box-shadow: 0 12px 40px rgba(10,123,74,0.22);
+        .bar-fill {
+          transition: width 1.2s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .metric-glow {
+          box-shadow: 0 0 0 1px rgba(10,123,74,0.12), 0 8px 32px rgba(10,123,74,0.08);
+        }
+        .section-label {
+          font-size: 10px;
+          letter-spacing: 0.14em;
+          text-transform: uppercase;
+          font-weight: 700;
+          color: #0A7B4A;
+        }
+        .phase-badge {
+          font-family: var(--font-jetbrains-mono, monospace);
+          font-size: 10px;
+          font-weight: 700;
+          letter-spacing: 0.12em;
         }
       `}</style>
 
-      {/* ── BANNER CAROUSEL ───────────────────────────────────────────── */}
+      {/* ── Banner ── */}
       <BannerCarousel />
 
-      {/* ── STATS BAR ─────────────────────────────────────────────────── */}
-      <section className="container mx-auto max-w-5xl px-4 py-16">
+      {/* ── Hero Stats ── */}
+      <section className="container mx-auto max-w-5xl px-4 py-14">
+        <motion.div {...fadeUp(0)} className="text-center mb-10">
+          <span className="section-label">AgroLeafAI · ConvNext-Base</span>
+          <h2 className="text-3xl md:text-4xl font-extrabold mt-3 text-[#1A2E1A] tracking-tight">
+            Model at a Glance
+          </h2>
+          <p className="text-[#3A4D3A]/60 mt-3 max-w-xl mx-auto leading-relaxed text-sm">
+            Trained from scratch on a curated 61 K-image dataset, covering 120 plant disease
+            classes across 24 crop types.
+          </p>
+        </motion.div>
+
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          {STATS.map(({ numericValue, suffix, prefix, label, icon }, i) => (
-            <StatCard
+          {MODEL_STATS.map(({ value, suffix, label, icon, color }, i) => (
+            <StatCounter
               key={label}
-              numericValue={numericValue}
+              value={value}
               suffix={suffix}
-              prefix={prefix}
               label={label}
               icon={icon}
+              color={color}
               delay={i * 0.08}
             />
           ))}
         </div>
       </section>
 
-      {/* ── HOW IT WORKS ──────────────────────────────────────────────── */}
-      <section id="how-it-works" className="container mx-auto max-w-5xl px-4 py-16">
-        <motion.div {...fadeUp(0)} className="text-center mb-14">
-          <span className="text-xs font-bold tracking-[0.14em] uppercase text-[#0A7B4A] dark:text-[#4ade80]">
-            How It Works
-          </span>
-          <h2 className="text-3xl md:text-4xl font-extrabold mt-3 text-[#1A2E1A] dark:text-white tracking-tight">
-            Diagnosis in four steps
+      {/* ── Accuracy Metrics ── */}
+      <section className="container mx-auto max-w-5xl px-4 pb-14">
+        <motion.div {...fadeUp(0)} className="text-center mb-10">
+          <span className="section-label">Performance</span>
+          <h2 className="text-3xl md:text-4xl font-extrabold mt-3 text-[#1A2E1A] tracking-tight">
+            Accuracy &amp; Metrics
           </h2>
-          <p className="text-[#3A4D3A]/60 dark:text-white/45 mt-3 max-w-xl mx-auto leading-relaxed">
-            From photo to treatment plan — the entire workflow takes under two seconds.
-          </p>
         </motion.div>
 
-        <div className="grid md:grid-cols-4 gap-5">
-          {HOW_IT_WORKS.map(({ step, icon: Icon, title, desc }, i) => (
-            <motion.div key={step} {...fadeUp(i * 0.1)} className="relative group">
-              {i < HOW_IT_WORKS.length - 1 && (
-                <div className="hidden md:block absolute top-9 left-[calc(50%+28px)] -right-7 h-px bg-linear-to-r from-[rgba(10,123,74,0.3)] to-transparent z-0" />
-              )}
-              <div className="glass-card crop-card relative rounded-2xl p-5 text-center transition-all duration-300 z-10">
-                <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-[rgba(10,123,74,0.1)] dark:bg-[rgba(10,123,74,0.2)] group-hover:bg-[#0A7B4A] transition-colors duration-300">
-                  <Icon className="h-6 w-6 text-[#0A7B4A] dark:text-[#4ade80] group-hover:text-white transition-colors" />
-                </div>
-                <span className={`${jetbrainsMono.className} text-[10px] font-bold text-[#0A7B4A]/50 dark:text-[#4ade80]/40 tracking-widest`}>
-                  {step}
-                </span>
-                <h3 className="mt-1 font-bold text-sm text-[#1A2E1A] dark:text-white">{title}</h3>
-                <p className="mt-2 text-xs text-[#3A4D3A]/60 dark:text-white/40 leading-relaxed">{desc}</p>
-              </div>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          {ACCURACY_METRICS.map(({ label, value, sub, color }, i) => (
+            <motion.div
+              key={label}
+              {...fadeUp(i * 0.09)}
+              className="glass-card-strong rounded-2xl px-5 py-6 metric-glow group hover:border-[rgba(10,123,74,0.35)] transition-all duration-300"
+            >
+              <p className="text-xs font-semibold text-[#3A4D3A]/55 mb-2">{label}</p>
+              <p
+                className={`${jetbrainsMono.className} text-2xl font-bold`}
+                style={{ color }}
+              >
+                {value}
+              </p>
+              <p className="text-[11px] text-[#3A4D3A]/50 mt-1">{sub}</p>
             </motion.div>
           ))}
         </div>
       </section>
 
-      {/* ── CROPS CAROUSEL ───────────────────────────────────────────── */}
-      <section className="container mx-auto max-w-6xl px-4 py-16">
-        <motion.div {...fadeUp(0)} className="text-center mb-12">
-          <span className="text-xs font-bold tracking-[0.14em] uppercase text-[#0A7B4A] dark:text-[#4ade80]">
-            Our Dataset
-          </span>
-          <h2 className="text-3xl md:text-4xl font-extrabold mt-3 text-[#1A2E1A] dark:text-white tracking-tight">
-            Crops & Fruits We Diagnose
+      {/* ── CNN Training Pipeline ── */}
+      <section className="container mx-auto max-w-5xl px-4 pb-20">
+        <motion.div {...fadeUp(0)} className="text-center mb-14">
+          <span className="section-label">Training Pipeline</span>
+          <h2 className="text-3xl md:text-4xl font-extrabold mt-3 text-[#1A2E1A] tracking-tight">
+            From Raw Images to Production Model
           </h2>
-          <p className="text-[#3A4D3A]/60 dark:text-white/45 mt-3 max-w-xl mx-auto leading-relaxed">
-            Trained on diverse, high-quality images covering multiple disease classes per plant.
+          <p className="text-[#3A4D3A]/60 mt-3 max-w-2xl mx-auto leading-relaxed text-sm">
+            A full end-to-end deep learning pipeline: data collection, cleaning, augmentation,
+            ConvNext fine-tuning, calibration, and ONNX export.
           </p>
         </motion.div>
 
-        <Carousel setApi={setCropApi} opts={{ loop: true }} className="w-full">
-          <CarouselContent className="-ml-4">
-            {CROPS_FRUITS.map((item, idx) => (
-              <CarouselItem key={idx} className="pl-4 md:basis-1/2 lg:basis-1/3">
+        <div className="relative">
+          {/* Vertical connector line */}
+          <div className="absolute left-8 md:left-1/2 md:-translate-x-px top-0 bottom-0 w-px pipeline-connector hidden md:block" />
+
+          <div className="space-y-8">
+            {PIPELINE_STEPS.map((step, i) => {
+              const Icon = step.icon;
+              const isEven = i % 2 === 0;
+              return (
                 <motion.div
-                  initial={{ opacity: 0, scale: 0.96 }}
-                  whileInView={{ opacity: 1, scale: 1 }}
-                  transition={{ delay: idx * 0.07 }}
-                  viewport={{ once: true }}
-                  whileHover={{ y: -6 }}
-                  className="h-full"
+                  key={step.phase}
+                  initial={{ opacity: 0, x: isEven ? -24 : 24 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  viewport={{ once: true, margin: "-60px" }}
+                  transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1], delay: 0.05 }}
+                  className={`relative md:flex md:items-start md:gap-8 ${isEven ? "md:flex-row" : "md:flex-row-reverse"}`}
                 >
-                  <div className="glass-card crop-card rounded-2xl overflow-hidden h-full transition-all duration-300 group">
-                    <div className="relative h-44 w-full overflow-hidden">
-                      <Image
-                        src={item.image}
-                        alt={`${item.name} crop`}
-                        fill
-                        sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                        className="object-cover transition-transform duration-500 group-hover:scale-105"
-                      />
-                      <div className="absolute inset-0 bg-linear-to-t from-black/40 to-transparent" />
-                      <span className="absolute top-3 right-3 text-xs font-semibold px-2.5 py-1 rounded-full bg-[#0A7B4A]/90 text-white backdrop-blur-sm">
-                        {item.diseasesCount} diseases
-                      </span>
-                    </div>
-                    <div className="p-5">
-                      <h3 className="font-bold text-[#1A2E1A] dark:text-white text-base">{item.name}</h3>
-                      <p className="text-xs italic text-[#3A4D3A]/55 dark:text-white/35 mt-0.5">
-                        {item.scientific}
+                  {/* Card */}
+                  <div className="md:w-[calc(50%-28px)] glass-card-strong rounded-2xl overflow-hidden group hover:shadow-[0_8px_40px_rgba(10,123,74,0.1)] transition-all duration-300">
+                    {/* Top accent bar */}
+                    <div
+                      className="h-1"
+                      style={{
+                        background: `linear-gradient(90deg, ${step.color}, ${step.color}44)`,
+                      }}
+                    />
+                    <div className="p-6">
+                      {/* Header */}
+                      <div className="flex items-start gap-4 mb-4">
+                        <div
+                          className="flex items-center justify-center h-11 w-11 rounded-xl shrink-0 transition-transform duration-300 group-hover:scale-110"
+                          style={{ background: step.bg, border: `1px solid ${step.border}` }}
+                        >
+                          <Icon className="h-5 w-5" style={{ color: step.color }} />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <span
+                              className="phase-badge px-2 py-0.5 rounded-md"
+                              style={{ background: step.bg, color: step.color }}
+                            >
+                              STEP {step.phase}
+                            </span>
+                          </div>
+                          <h3 className="font-bold text-[#1A2E1A] text-base mt-1 leading-tight">
+                            {step.title}
+                          </h3>
+                          <p className="text-xs text-[#3A4D3A]/50 mt-0.5">{step.subtitle}</p>
+                        </div>
+                      </div>
+
+                      {/* Description */}
+                      <p className="text-xs text-[#3A4D3A]/70 leading-relaxed mb-4">
+                        {step.description}
                       </p>
-                      <p className="mt-2.5 text-xs text-[#3A4D3A]/65 dark:text-white/45 leading-relaxed">
-                        {item.description}
-                      </p>
-                      <div className="mt-4 flex items-center gap-1.5 text-xs font-semibold text-[#0A7B4A] dark:text-[#4ade80]">
-                        <ChevronRight className="h-3.5 w-3.5" />
-                        View diseases
+
+                      {/* Details grid */}
+                      <div className="grid grid-cols-2 gap-2">
+                        {step.details.map(({ label, value }) => (
+                          <div
+                            key={label}
+                            className="rounded-lg px-3 py-2"
+                            style={{ background: step.bg, border: `1px solid ${step.border}` }}
+                          >
+                            <p className="text-[10px] font-semibold text-[#3A4D3A]/50 mb-0.5">
+                              {label}
+                            </p>
+                            <p
+                              className={`${jetbrainsMono.className} text-xs font-bold leading-snug`}
+                              style={{ color: step.color }}
+                            >
+                              {value}
+                            </p>
+                          </div>
+                        ))}
                       </div>
                     </div>
                   </div>
+
+                  {/* Centre dot */}
+                  <div className="hidden md:flex absolute left-1/2 -translate-x-1/2 top-6 z-10 items-center justify-center">
+                    <div
+                      className="h-7 w-7 rounded-full flex items-center justify-center text-white font-bold text-[9px] shadow-lg"
+                      style={{ background: step.color }}
+                    >
+                      {step.phase}
+                    </div>
+                  </div>
+
+                  {/* Spacer on other side */}
+                  <div className="hidden md:block md:w-[calc(50%-28px)]" />
                 </motion.div>
-              </CarouselItem>
-            ))}
-          </CarouselContent>
-          <CarouselPrevious className="hidden md:flex border-[rgba(10,123,74,0.3)] text-[#0A7B4A] hover:bg-[rgba(10,123,74,0.08)] hover:text-[#0A7B4A] dark:border-[rgba(10,123,74,0.4)] dark:text-[#4ade80] dark:hover:bg-[rgba(10,123,74,0.2)]" />
-          <CarouselNext className="hidden md:flex border-[rgba(10,123,74,0.3)] text-[#0A7B4A] hover:bg-[rgba(10,123,74,0.08)] hover:text-[#0A7B4A] dark:border-[rgba(10,123,74,0.4)] dark:text-[#4ade80] dark:hover:bg-[rgba(10,123,74,0.2)]" />
-        </Carousel>
+              );
+            })}
+          </div>
+        </div>
       </section>
 
-      {/* ── DISEASE TREE ──────────────────────────────────────────────── */}
-      <section id="diseases" className="container mx-auto max-w-6xl px-4 py-16">
-        <motion.div {...fadeUp(0)} className="text-center mb-14">
-          <span className="text-xs font-bold tracking-[0.14em] uppercase text-[#0A7B4A] dark:text-[#4ade80]">
-            Disease Library
-          </span>
-          <h2 className="text-3xl md:text-4xl font-extrabold mt-3 text-[#1A2E1A] dark:text-white tracking-tight">
-            Common Diseases by Crop
+      {/* ── Dataset Insights ── */}
+      <section className="container mx-auto max-w-5xl px-4 pb-20">
+        <motion.div {...fadeUp(0)} className="text-center mb-12">
+          <span className="section-label">Dataset Insights</span>
+          <h2 className="text-3xl md:text-4xl font-extrabold mt-3 text-[#1A2E1A] tracking-tight">
+            Data Quality &amp; Preprocessing
           </h2>
-          <p className="text-[#3A4D3A]/60 dark:text-white/45 mt-3 max-w-2xl mx-auto leading-relaxed">
-            Explore the most prevalent diseases, severity levels, symptoms, and recommended treatments.
-            Tap any disease for detailed prevention guidance.
+          <p className="text-[#3A4D3A]/60 mt-3 max-w-xl mx-auto leading-relaxed text-sm">
+            High-quality training data is the foundation of robust plant disease detection.
           </p>
         </motion.div>
 
-        <motion.div
-          ref={ref}
-          variants={staggerContainer}
-          initial="hidden"
-          animate={controls}
-          className="grid gap-5 md:grid-cols-2"
-        >
-          {DISEASE_TREE.map((category) => (
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-10">
+          {DATASET_INSIGHTS.map(({ icon: Icon, label, value, sub, color }, i) => (
             <motion.div
-              key={category.crop}
-              variants={staggerItem}
-              whileHover={{ y: -5 }}
-              transition={{ type: "spring", stiffness: 280, damping: 22 }}
+              key={label}
+              {...fadeUp(i * 0.07)}
+              className="glass-card rounded-2xl p-5 group hover:border-[rgba(10,123,74,0.3)] hover:shadow-[0_8px_28px_rgba(10,123,74,0.08)] transition-all duration-300"
             >
-              <div className="glass-card crop-card rounded-2xl overflow-hidden h-full transition-all duration-300">
-                <div className={`h-1.5 bg-linear-to-r ${category.accentDark}`} />
-                <div className="px-6 pt-5 pb-3 flex items-center gap-3">
-                  <div className="flex items-center justify-center h-10 w-10 rounded-xl bg-[rgba(10,123,74,0.1)] dark:bg-[rgba(10,123,74,0.18)] shrink-0">
-                    <category.icon className="h-5 w-5 text-[#0A7B4A] dark:text-[#4ade80]" />
-                  </div>
-                  <div>
-                    <h3 className="text-lg font-bold text-[#1A2E1A] dark:text-white leading-tight">
-                      {category.crop}
-                    </h3>
-                    <p className="text-xs text-[#3A4D3A]/50 dark:text-white/35">
-                      {category.diseases.length} documented diseases
-                    </p>
-                  </div>
-                </div>
-
-                <div className="px-5 pb-3 space-y-2">
-                  {category.diseases.map((disease) => (
-                    <Accordion key={disease.name} type="single" collapsible className="w-full">
-                      <AccordionItem
-                        value={disease.name}
-                        className="rounded-xl overflow-hidden bg-[rgba(245,250,240,0.5)] border border-[rgba(10,123,74,0.12)]"
-                      >
-                        <div className="px-3.5 pt-3 pb-1">
-                          <div className="flex items-start justify-between gap-3">
-                            <div className="flex-1 min-w-0">
-                              <div className="flex items-center gap-2 flex-wrap">
-                                <h4 className="font-semibold text-sm text-[#1A2E1A] dark:text-white">
-                                  {disease.name}
-                                </h4>
-                                {disease.severity === "Critical" && (
-                                  <AlertTriangle className="h-3.5 w-3.5 text-red-500 shrink-0" />
-                                )}
-                              </div>
-                              <span className={`mt-1 inline-flex items-center text-[10px] font-semibold px-2 py-0.5 rounded-full ${severityStyle(disease.severity)}`}>
-                                {disease.severity}
-                              </span>
-                            </div>
-                            <span className="text-[10px] font-medium text-[#3A4D3A]/60 dark:text-white/40 bg-white/80 dark:bg-white/5 border border-[rgba(10,123,74,0.12)] px-2.5 py-1 rounded-lg shrink-0 max-w-30 text-right leading-tight">
-                              {disease.treatment}
-                            </span>
-                          </div>
-
-                          <AccordionTrigger className="text-[11px] font-semibold text-[#0A7B4A] dark:text-[#4ade80] hover:text-[#2C5F2D] py-1.5 hover:no-underline [&>svg]:h-3 [&>svg]:w-3">
-                            View details & prevention
-                          </AccordionTrigger>
-                        </div>
-
-                        <AccordionContent className="px-3.5 pb-3 pt-0">
-                          <div className="border-t border-[rgba(10,123,74,0.1)] pt-2.5 space-y-2">
-                            {[
-                              { icon: Droplets, label: "Symptoms", text: disease.symptoms },
-                              { icon: Shield, label: "Prevention", text: disease.prevention },
-                              { icon: Tractor, label: "Treatment", text: disease.treatment },
-                            ].map(({ icon: Icon, label, text }) => (
-                              <div key={label} className="flex items-start gap-2.5 text-xs">
-                                <Icon className="h-3.5 w-3.5 text-[#0A7B4A] dark:text-[#4ade80] mt-0.5 shrink-0" />
-                                <span className="text-[#3A4D3A]/75 dark:text-white/55">
-                                  <strong className="text-[#1A2E1A] dark:text-white/80">{label}:</strong>{" "}
-                                  {text}
-                                </span>
-                              </div>
-                            ))}
-                          </div>
-                        </AccordionContent>
-                      </AccordionItem>
-                    </Accordion>
-                  ))}
-                </div>
-
-                <div className="px-5 pb-5">
-                  <button className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl text-xs font-semibold text-[#0A7B4A] dark:text-[#4ade80] border border-[rgba(10,123,74,0.2)] hover:bg-[rgba(10,123,74,0.06)] dark:hover:bg-[rgba(10,123,74,0.14)] transition-colors">
-                    <Search className="h-3.5 w-3.5" />
-                    View all {category.diseases.length}+ diseases
-                  </button>
-                </div>
+              <div
+                className="h-10 w-10 rounded-xl flex items-center justify-center mb-3 transition-transform duration-300 group-hover:scale-110"
+                style={{ background: `${color}14` }}
+              >
+                <Icon className="h-4.5 w-4.5" style={{ color }} />
               </div>
+              <p className="text-[11px] font-semibold text-[#3A4D3A]/50 mb-1">{label}</p>
+              <p className="font-bold text-[#1A2E1A] text-sm">{value}</p>
+              <p className="text-[11px] text-[#3A4D3A]/50 mt-0.5 leading-snug">{sub}</p>
             </motion.div>
           ))}
+        </div>
+
+        {/* Class distribution by crop */}
+        <motion.div {...fadeUp(0.1)} className="glass-card-strong rounded-2xl p-6 md:p-8">
+          <div className="flex items-center gap-3 mb-6">
+            <div className="h-9 w-9 rounded-xl bg-[rgba(10,123,74,0.1)] flex items-center justify-center">
+              <BarChart3 className="h-4.5 w-4.5 text-[#0A7B4A]" />
+            </div>
+            <div>
+              <h3 className="font-bold text-[#1A2E1A] text-sm">Class Distribution by Crop</h3>
+              <p className="text-[11px] text-[#3A4D3A]/50">Disease classes per plant type</p>
+            </div>
+          </div>
+
+          <div className="space-y-3">
+            {CROP_GROUPS.map(({ crop, classes, healthy, diseased, bar }, i) => (
+              <motion.div
+                key={crop}
+                initial={{ opacity: 0, x: -12 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.04, duration: 0.45 }}
+                className="flex items-center gap-4"
+              >
+                <p className="text-xs font-semibold text-[#1A2E1A] w-24 shrink-0">{crop}</p>
+                <div className="flex-1 h-6 rounded-lg bg-[rgba(10,123,74,0.06)] overflow-hidden relative">
+                  <motion.div
+                    initial={{ width: 0 }}
+                    whileInView={{ width: `${bar}%` }}
+                    viewport={{ once: true }}
+                    transition={{ delay: i * 0.04 + 0.2, duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
+                    className="absolute inset-y-0 left-0 rounded-lg"
+                    style={{
+                      background: `linear-gradient(90deg, #0A7B4A, #10B981)`,
+                    }}
+                  />
+                  <div className="absolute inset-0 flex items-center px-3 gap-2">
+                    <span className="text-[10px] font-bold text-white relative z-10 mix-blend-difference">
+                      {classes} classes
+                    </span>
+                  </div>
+                </div>
+                <div className="flex gap-2 shrink-0">
+                  <span className="text-[10px] px-2 py-0.5 rounded-full bg-[rgba(10,123,74,0.1)] text-[#0A7B4A] font-semibold">
+                    {healthy} healthy
+                  </span>
+                  <span className="text-[10px] px-2 py-0.5 rounded-full bg-[rgba(239,68,68,0.08)] text-red-600 font-semibold hidden md:inline">
+                    {diseased} diseased
+                  </span>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+
+          <div className="mt-5 pt-5 border-t border-[rgba(10,123,74,0.1)] flex flex-wrap gap-4 text-[11px] text-[#3A4D3A]/55">
+            <span>
+              <strong className="text-[#0A7B4A]">120</strong> total classes after normalisation
+            </span>
+            <span>·</span>
+            <span>
+              <strong className="text-[#0A7B4A]">61 K+</strong> images in total
+            </span>
+            <span>·</span>
+            <span>
+              <strong className="text-[#0A7B4A]">Stratified</strong> train/val/test splits
+            </span>
+          </div>
         </motion.div>
       </section>
 
-      {/* ── CTA ───────────────────────────────────────────────────────── */}
-      <section className="relative px-4 mt-8 mb-24">
+      {/* ── Architecture Deep Dive ── */}
+      <section className="container mx-auto max-w-5xl px-4 pb-20">
+        <motion.div {...fadeUp(0)} className="text-center mb-12">
+          <span className="section-label">Architecture</span>
+          <h2 className="text-3xl md:text-4xl font-extrabold mt-3 text-[#1A2E1A] tracking-tight">
+            ConvNext-Base · Custom Head
+          </h2>
+          <p className="text-[#3A4D3A]/60 mt-3 max-w-xl mx-auto leading-relaxed text-sm">
+            A modern CNN backbone with a regularised MLP classification head, optimised for
+            multi-class plant disease detection.
+          </p>
+        </motion.div>
+
+        <div className="grid md:grid-cols-2 gap-6">
+          {/* Architecture diagram card */}
+          <motion.div {...fadeUp(0)} className="glass-card-strong rounded-2xl p-6">
+            <h3 className="font-bold text-[#1A2E1A] text-sm mb-5 flex items-center gap-2">
+              <Layers className="h-4 w-4 text-[#0A7B4A]" />
+              Model Layers
+            </h3>
+            <div className="space-y-2">
+              {[
+                { layer: "Input", shape: "[B, 3, 224, 224]", color: "#0D9488", note: "Normalised RGB" },
+                { layer: "ConvNext-Base Backbone", shape: "~87M params", color: "#0A7B4A", note: "Pretrained ImageNet-1K" },
+                { layer: "LayerNorm", shape: "[B, 1024]", color: "#2C5F2D", note: "Stabilises features" },
+                { layer: "Dropout (p=0.4)", shape: "—", color: "#F59E0B", note: "Regularisation" },
+                { layer: "Linear → 512", shape: "[B, 512]", color: "#0A7B4A", note: "Feature compression" },
+                { layer: "GELU Activation", shape: "—", color: "#2C5F2D", note: "Non-linearity" },
+                { layer: "Dropout (p=0.2)", shape: "—", color: "#F59E0B", note: "Head regularisation" },
+                { layer: "Linear → 120", shape: "[B, 120]", color: "#0A7B4A", note: "Disease logits" },
+                { layer: "Softmax / Temp T*", shape: "[B, 120]", color: "#0D9488", note: "Calibrated probabilities" },
+              ].map(({ layer, shape, color, note }, i) => (
+                <motion.div
+                  key={layer}
+                  initial={{ opacity: 0, x: -10 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: i * 0.05 }}
+                  className="flex items-center gap-3 px-3 py-2 rounded-lg"
+                  style={{ background: `${color}08`, border: `1px solid ${color}20` }}
+                >
+                  <div className="h-2 w-2 rounded-full shrink-0" style={{ background: color }} />
+                  <div className="flex-1 min-w-0">
+                    <p className="text-xs font-semibold text-[#1A2E1A] truncate">{layer}</p>
+                    <p className="text-[10px] text-[#3A4D3A]/50">{note}</p>
+                  </div>
+                  <span
+                    className={`${jetbrainsMono.className} text-[10px] font-bold shrink-0`}
+                    style={{ color }}
+                  >
+                    {shape}
+                  </span>
+                </motion.div>
+              ))}
+            </div>
+          </motion.div>
+
+          {/* Training config card */}
+          <div className="space-y-4">
+            <motion.div {...fadeUp(0.1)} className="glass-card-strong rounded-2xl p-6">
+              <h3 className="font-bold text-[#1A2E1A] text-sm mb-4 flex items-center gap-2">
+                <Cpu className="h-4 w-4 text-[#0A7B4A]" />
+                Training Configuration
+              </h3>
+              <div className="grid grid-cols-2 gap-2">
+                {[
+                  { k: "Batch Size", v: "32 + Grad Accum×2" },
+                  { k: "Max Epochs", v: "40" },
+                  { k: "Backbone LR", v: "1e-5" },
+                  { k: "Head LR", v: "1e-3" },
+                  { k: "Weight Decay", v: "0.02" },
+                  { k: "Label Smooth", v: "0.1" },
+                  { k: "Focal γ", v: "2.0" },
+                  { k: "Warmup", v: "2 epochs (linear)" },
+                  { k: "Scheduler", v: "Cosine → η_min=1e-7" },
+                  { k: "AMP", v: "CUDA float16" },
+                ].map(({ k, v }) => (
+                  <div key={k} className="px-3 py-2 rounded-lg bg-[rgba(10,123,74,0.05)] border border-[rgba(10,123,74,0.1)]">
+                    <p className="text-[10px] text-[#3A4D3A]/50">{k}</p>
+                    <p className={`${jetbrainsMono.className} text-xs font-bold text-[#0A7B4A]`}>{v}</p>
+                  </div>
+                ))}
+              </div>
+            </motion.div>
+
+            <motion.div {...fadeUp(0.15)} className="glass-card-strong rounded-2xl p-6">
+              <h3 className="font-bold text-[#1A2E1A] text-sm mb-4 flex items-center gap-2">
+                <Award className="h-4 w-4 text-[#0A7B4A]" />
+                Export &amp; Deployment
+              </h3>
+              <div className="space-y-2">
+                {[
+                  { label: "PyTorch checkpoint", note: "best_model_224.pt · macro-F1 optimised" },
+                  { label: "ONNX (opset 18)", note: "Simplified + smoke-tested on CPU" },
+                  { label: "Temperature JSON", note: "LBFGS calibration on val set" },
+                  { label: "class_names.json", note: "120 normalised class labels" },
+                  { label: "Kaggle upload", note: "kagglehub → agroleaf-model-export-v10" },
+                ].map(({ label, note }) => (
+                  <div key={label} className="flex items-start gap-2.5">
+                    <CheckCircle2 className="h-3.5 w-3.5 text-[#10B981] shrink-0 mt-0.5" />
+                    <div>
+                      <p className="text-xs font-semibold text-[#1A2E1A]">{label}</p>
+                      <p className="text-[10px] text-[#3A4D3A]/50">{note}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </motion.div>
+          </div>
+        </div>
+      </section>
+
+      {/* ── CTA ── */}
+      <section className="relative px-4 mb-24">
         <div className="container mx-auto max-w-4xl">
           <motion.div
             initial={{ opacity: 0, scale: 0.97 }}
             whileInView={{ opacity: 1, scale: 1 }}
             viewport={{ once: true }}
             transition={{ duration: 0.65, ease: [0.16, 1, 0.3, 1] }}
-            className="relative overflow-hidden rounded-3xl p-10 md:p-14 text-center shadow-[0_24px_80px_rgba(10,123,74,0.35)]"
+            className="relative overflow-hidden rounded-3xl p-10 md:p-14 text-center"
+            style={{
+              background: "linear-gradient(135deg, #0A7B4A 0%, #2C5F2D 60%, #1A2E1A 100%)",
+              boxShadow: "0 24px 80px rgba(10,123,74,0.35)",
+            }}
           >
-            {/* ── Background image ── */}
-            <Image
-              src="/images/crop-fruits/rice-1.jpeg"
-              alt=""
-              fill
-              className="object-cover object-center"
-              priority
-              loading="eager"
-            />
-
-            {/* ── Dark gradient overlay ── */}
-            <div className="absolute inset-0 bg-linear-to-br from-black/70 via-[#0A7B4A]/60 to-black/75" />
-
-            {/* ── Original decorative layers (kept on top of overlay) ── */}
             <div
               className="absolute inset-0 opacity-[0.06]"
               style={{
-                backgroundImage: "radial-gradient(circle,rgba(255,255,255,0.8) 1.5px,transparent 1.5px)",
+                backgroundImage:
+                  "radial-gradient(circle,rgba(255,255,255,0.8) 1.5px,transparent 1.5px)",
                 backgroundSize: "28px 28px",
               }}
             />
             <div className="absolute top-0 left-1/4 w-64 h-64 rounded-full bg-white/5 blur-3xl pointer-events-none" />
             <div className="absolute bottom-0 right-1/4 w-48 h-48 rounded-full bg-[#10B981]/10 blur-3xl pointer-events-none" />
 
-            {/* ── Content ── */}
             <div className="relative z-10">
               <motion.div
                 initial={{ opacity: 0, y: 10 }}
@@ -965,15 +844,15 @@ export default function HomePage() {
                 className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/15 border border-white/25 text-white/90 text-xs font-semibold mb-6"
               >
                 <CheckCircle2 className="h-3.5 w-3.5" />
-                Free for farmers & researchers
+                Free for farmers &amp; researchers
               </motion.div>
 
               <h3 className="text-3xl md:text-4xl font-extrabold text-white tracking-tight">
                 Ready to protect your harvest?
               </h3>
-              <p className="mt-3 max-w-lg mx-auto text-white/65 leading-relaxed">
-                Upload any affected leaf or fruit image — get instant AI diagnosis
-                and organic treatment plans delivered in seconds.
+              <p className="mt-3 max-w-lg mx-auto text-white/65 leading-relaxed text-sm">
+                Upload any affected leaf or fruit image — get instant AI diagnosis and
+                organic treatment plans delivered in seconds.
               </p>
 
               <div className="mt-8 flex flex-wrap justify-center gap-4">
@@ -988,13 +867,14 @@ export default function HomePage() {
                     <ArrowRight className="h-4 w-4" />
                   </motion.button>
                 </Link>
-                <Link href="/how-it-works">
+                <Link href="/model">
                   <motion.button
                     whileHover={{ scale: 1.03 }}
                     whileTap={{ scale: 0.97 }}
                     className="inline-flex items-center gap-2 px-6 py-3.5 rounded-xl font-semibold text-sm text-white border border-white/30 bg-white/10 hover:bg-white/20 transition-all backdrop-blur-sm"
                   >
-                    Learn How It Works
+                    <BarChart3 className="h-4 w-4" />
+                    View Full Report
                   </motion.button>
                 </Link>
               </div>

@@ -1,6 +1,7 @@
 // app/page.tsx
 import { Metadata } from "next";
 import HomePage from "@/components/home/HomePage";
+import { getShuffledImageUrls } from "@/lib/cloudinary/get-images";
 
 export const metadata: Metadata = {
   title: "AgroLeaf AI – AI-Powered Crop Disease Detection & Treatment",
@@ -32,6 +33,6 @@ export const metadata: Metadata = {
   },
 };
 
-export default function Page() {
+export default async function Page() {
   return <HomePage />;
 }
