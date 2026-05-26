@@ -39,6 +39,7 @@ import {
 } from "lucide-react";
 import { plusJakarta, jetbrainsMono } from "@/fonts/google-fonts";
 import { BannerCarousel } from "./BannerCarousel";
+import TrainingPipelineSection from "./TrainingPipelineSection";
 
 // ──────────────────────────────────────────────────────────────────
 // Animation helpers
@@ -429,6 +430,9 @@ export default function HomePage() {
 
       {/* ── Banner ── */}
       <BannerCarousel />
+
+
+      <TrainingPipelineSection />
 
       {/* ── Hero Stats ── */}
       <section className="container mx-auto max-w-5xl px-4 py-14">
